@@ -8,15 +8,15 @@
 // Components Used:	MIKROE-340
 //////////////////////////////////////////////////////
 
-module ADC_Control(CS,P4,NC,P3,P5,clk);
+module ADC_Control(clk,P3);//CS,P4,NC,P3,P5,clk);
 
-	input P4;  // MISO
+	//input P4;  // MISO
 	input clk; // 50MHz FPGA clock
 	
-	output CS,NC;
+	//output CS,NC;
 	
 	output reg P3; // 50kHz ADC clock
-	output reg P5; // MOSI
+	//output reg P5; // MOSI
 	
 	reg [9:0]counter;
 	
