@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////
-// Date: 				6/19/2020
+// Date: 				6/20/2020
 // Contributors: 		Lucy Rukstales, Michaela Mitchell
 //
 // Description: 		This file allows for data collection from an analog to digital converter (ADC)
@@ -18,8 +18,10 @@ module ADC_Control(clk,P3,CS,P4);//,NC,P3,P5,clk);
 	//output reg P5; // MOSI
 	
 	reg [9:0]counter;
-	reg [4:0]cnt13;
+	reg [4:0]cnt12;
 	reg [11:0]sample;
+	
+	initial CS = 1'b1;
 	
 	//----------------------------------------------------
 	// Scale the clk from 50MHz to 50kHz
@@ -42,32 +44,36 @@ module ADC_Control(clk,P3,CS,P4);//,NC,P3,P5,clk);
 	end
 	
 	//----------------------------------------------------
-	// Count to 13 using cnt13
-	always @(posedge P3) begin
+	// Enable the ADC
+	always @ (posedge P3) CS <= 1'b0;
 	
-		if (cnt13 == 4'd12)
-			cnt13 <= 1'b0;
-			
-		cnt13 <= cnt13 + 1'b1;
+	//----------------------------------------------------
+	// Count to 12 using cnt12
+	always @ (posedge P3) begin
+	
+		if(CS == 1'b0) begin
+		
+			if (cnt12 == 4'd11) cnt12 <= 1'b0;
+				
+			cnt12 <= cnt12 + 1'b1;
+		
+		end
 		
 	end
 	
 	//----------------------------------------------------
 	// Read from the ADC, 12-bits at a time
 	// P4 to be used for MISO
-	// This may end up a bit off with each iteration due to CS
 	always @ (posedge P3) begin
 	
-		if (cnt13 == 1'b0)
-			CS <= 1'b0;
+		if (CS == 1'b0) begin
+
+			if (cnt12 < 4'd12) begin
+				sample[11:1] <= sample[10:0];
+				sample[0] <= P4;
+			end
 		
-		else if (cnt13 <= 4'd12) begin
-			sample[11:1] <= sample[10:0];
-			sample[0] <= P4;
 		end
-			
-		else
-			CS <= 1'b1;
 		
 	end
 	
