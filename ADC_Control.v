@@ -43,6 +43,10 @@ module ADC_Control(clk,P3,CS,P4);//,NC,P3,P5,clk);
 			
 	end
 	
+	/////////////////////////////////////////////////////////////////////////////////
+	// Rewrite all ADC control with chip timing in mind. It's not as simple as currently written :(
+	/////////////////////////////////////////////////////////////////////////////////
+		
 	//----------------------------------------------------
 	// Enable the ADC
 	always @ (posedge P3) CS <= 1'b0;
