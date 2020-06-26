@@ -44,14 +44,10 @@ module ADC_Control(clk,CS,P3,P4, P5);
 	//----------------------------------------------------
 	// Count to 20 to step through ADC initialization and data transfer
 	always @ (posedge P3) begin
-	
-		if(CS == 1'b0) begin
 		
-			if (cnt20 == 4'd19) cnt20 <= 1'b0;
-				
-			cnt20 <= cnt20 + 1'b1;
-		
-		end
+		if (cnt20 == 4'd19) cnt20 <= 1'b0;
+
+		cnt20 <= cnt20 + 1'b1;
 		
 	end
 	
