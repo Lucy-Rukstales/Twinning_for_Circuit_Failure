@@ -46,7 +46,7 @@ module ADC_Control(clk,CS,P3,P4, P5);
 	always @ (posedge P3) begin
 		
 		if (cnt20 == 4'd19) cnt20 <= 1'b0;
-
+			
 		cnt20 <= cnt20 + 1'b1;
 		
 	end
@@ -96,7 +96,7 @@ module ADC_Control(clk,CS,P3,P4, P5);
 	// P4 to be used for MISO
 	always @ (posedge P3) begin
 	
-		if (cnt20 >= 4'd7) begin
+		if (cnt20 >= 4'd8) begin
 			sample[11:1] <= sample[10:0];
 			sample[0] <= P4;
 		end
