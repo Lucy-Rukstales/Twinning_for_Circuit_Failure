@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////
-// Date: 				6/20/2020
+// Date: 				6/26/2020
 // Contributors: 		Lucy Rukstales, Michaela Mitchell
 //
 // Description: 		This file allows for data collection from an analog to digital converter (ADC)
@@ -8,20 +8,18 @@
 // Components Used:	MIKROE-340
 //////////////////////////////////////////////////////
 
-module ADC_Control(clk,P3,CS,P4);//,NC,P3,P5,clk);
+module ADC_Control(clk,CS,P3,P4, P5);
 
 	input P4;  // MISO
 	input clk; // 50MHz FPGA clock
 	
-	output reg CS;//,NC;
+	output reg CS; // Chip Select
 	output reg P3; // 50kHz ADC clock
-	//output reg P5; // MOSI
+	output reg P5; // MOSI
 	
 	reg [9:0]counter;
-	reg [4:0]cnt12;
+	reg [4:0]cnt20;
 	reg [11:0]sample;
-	
-	initial CS = 1'b1;
 	
 	//----------------------------------------------------
 	// Scale the clk from 50MHz to 50kHz
@@ -42,27 +40,59 @@ module ADC_Control(clk,P3,CS,P4);//,NC,P3,P5,clk);
 			counter <= 1'b0;
 			
 	end
-	
-	/////////////////////////////////////////////////////////////////////////////////
-	// Rewrite all ADC control with chip timing in mind. It's not as simple as currently written :(
-	/////////////////////////////////////////////////////////////////////////////////
 		
 	//----------------------------------------------------
-	// Enable the ADC
-	always @ (posedge P3) CS <= 1'b0;
-	
-	//----------------------------------------------------
-	// Count to 12 using cnt12
+	// Count to 20 to step through ADC initialization and data transfer
 	always @ (posedge P3) begin
 	
 		if(CS == 1'b0) begin
 		
-			if (cnt12 == 4'd11) cnt12 <= 1'b0;
+			if (cnt20 == 4'd19) cnt20 <= 1'b0;
 				
-			cnt12 <= cnt12 + 1'b1;
+			cnt20 <= cnt20 + 1'b1;
 		
 		end
 		
+	end
+	
+	//----------------------------------------------------
+	// Initialize the ADC to prepare for data transfer
+	// P5 to be used for MOSI
+	always @ (negedge P3) begin
+		case(cnt20)
+			0: begin // Initialization
+					CS <= 1'b1;
+					P5 <= 1'b0;
+				end
+				
+			1: begin // Start Bit
+					CS <= 1'b0;
+					P5 <= 1'b1;
+				end
+				
+			2: begin // Control: Single Ended
+					CS <= 1'b0;
+					P5 <= 1'b1;
+				end
+				
+			3: begin // Control: Don't Care
+					CS <= 1'b0;
+				end
+				
+			4: begin // Control: Channel 0
+					CS <= 1'b0;
+					P5 <= 1'b0;
+				end
+				
+			5: begin // Control: Channel 0
+					CS <= 1'b0;
+					P5 <= 1'b0;
+				end
+				
+			default: CS <= 1'b0;
+			
+		endcase
+					
 	end
 	
 	//----------------------------------------------------
@@ -70,13 +100,9 @@ module ADC_Control(clk,P3,CS,P4);//,NC,P3,P5,clk);
 	// P4 to be used for MISO
 	always @ (posedge P3) begin
 	
-		if (CS == 1'b0) begin
-
-			if (cnt12 < 4'd12) begin
-				sample[11:1] <= sample[10:0];
-				sample[0] <= P4;
-			end
-		
+		if (cnt20 >= 4'd7) begin
+			sample[11:1] <= sample[10:0];
+			sample[0] <= P4;
 		end
 		
 	end
