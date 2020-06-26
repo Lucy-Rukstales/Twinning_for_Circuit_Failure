@@ -23,7 +23,7 @@ module ADC_Control(clk,CS,P3,P4, P5);
 	
 	//----------------------------------------------------
 	// Scale the clk from 50MHz to 50kHz
-	// P3 to be used with the ADC
+	// P3 to be used as the ADC clock
 	always @ (posedge clk) begin
 		
 		if(counter < 10'd500) begin
