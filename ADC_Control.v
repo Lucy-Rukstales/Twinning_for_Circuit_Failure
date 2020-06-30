@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////
-// Date: 				6/26/2020
+// Date: 				6/29/2020
 // Contributors: 		Lucy Rukstales, Michaela Mitchell
 //
 // Description: 		This file allows for data collection from an analog to digital converter (ADC)
@@ -8,10 +8,11 @@
 // Components Used:	MIKROE-340
 //////////////////////////////////////////////////////
 
-module ADC_Control(clk,CS,P3,P4, P5);
+module ADC_Control(clk,rst,CS,P3,P4,P5);
 
 	input P4;  // MISO
 	input clk; // 50MHz FPGA clock
+	input rst;
 	
 	output reg CS; // Chip Select
 	output reg P3; // 50kHz ADC clock
@@ -24,81 +25,111 @@ module ADC_Control(clk,CS,P3,P4, P5);
 	//----------------------------------------------------
 	// Scale the clk from 50MHz to 50kHz
 	// P3 to be used as the ADC clock
-	always @ (posedge clk) begin
+	always @ (posedge clk or negedge rst) begin
 		
-		if(counter < 10'd500) begin
-			P3 <= 1'b1;
-			counter <= counter + 1'b1;
-		end
+		if (rst == 1'b0) counter <= 10'd0;
 		
-		else if (counter < 10'd999) begin
-			P3 <= 1'b0;
-			counter <= counter + 1'b1;
-		end
+		else begin
 		
-		else
-			counter <= 1'b0;
+			if (counter < 10'd999) counter <= counter + 1'b1;
 			
+			else counter <= 1'b0;
+			
+		end
+			
+	end
+	
+	always @ (*) begin
+		
+		if (counter == 10'd0) P3 = 1'b1;
+		
+		else if (counter == 10'd500) P3 = 1'b0;
+		
 	end
 		
 	//----------------------------------------------------
 	// Count to 20 to step through ADC initialization and data transfer
-	always @ (posedge P3) begin
+	always @ (*) begin
 		
-		if (cnt20 == 4'd19) cnt20 <= 1'b0;
-			
-		cnt20 <= cnt20 + 1'b1;
+		if (counter == 10'd0) begin
+		
+			//if (cnt20 == 5'd19) cnt20 = 1'b0;
+				
+			cnt20 = cnt20 + 1'b1;
+		
+		end
 		
 	end
 	
 	//----------------------------------------------------
 	// Initialize the ADC to prepare for data transfer
 	// P5 to be used for MOSI
-	always @ (negedge P3) begin
-		case(cnt20)
-			0: begin // Initialization
-					CS <= 1'b1;
-					P5 <= 1'b0;
-				end
+	always @ (*) begin
+	
+		if (counter == 10'd500) begin
+		
+			case(cnt20)
+				0: begin // Initialization
+						CS = 1'b1;
+						P5 = 1'b0;
+					end
+					
+				1: begin // Start Bit
+						CS = 1'b0;
+						P5 = 1'b1;
+					end
+					
+				2: begin // Control: Single Ended
+						CS = 1'b0;
+						P5 = 1'b1;
+					end
+					
+				3: begin // Control: Don't Care
+						CS = 1'b0;
+					end
+					
+				4: begin // Control: Channel 0
+						CS = 1'b0;
+						P5 = 1'b0;
+					end
+					
+				5: begin // Control: Channel 0
+						CS = 1'b0;
+						P5 = 1'b0;
+					end
+					
+				20: begin
+						CS = 1'b1;
+					end
+					
+				default: CS = 1'b0;
 				
-			1: begin // Start Bit
-					CS <= 1'b0;
-					P5 <= 1'b1;
-				end
-				
-			2: begin // Control: Single Ended
-					CS <= 1'b0;
-					P5 <= 1'b1;
-				end
-				
-			3: begin // Control: Don't Care
-					CS <= 1'b0;
-				end
-				
-			4: begin // Control: Channel 0
-					CS <= 1'b0;
-					P5 <= 1'b0;
-				end
-				
-			5: begin // Control: Channel 0
-					CS <= 1'b0;
-					P5 <= 1'b0;
-				end
-				
-			default: CS <= 1'b0;
+			endcase
 			
-		endcase
+		end
 					
 	end
 	
 	//----------------------------------------------------
 	// Read from the ADC, 12-bits at a time
 	// P4 to be used for MISO
-	always @ (posedge P3) begin
+	always @ (posedge clk or negedge rst) begin
 	
-		if (cnt20 >= 4'd8) begin
-			sample[11:1] <= sample[10:0];
-			sample[0] <= P4;
+		if (rst == 1'b0) sample <= 12'd0;
+		
+		else begin
+		
+			if (counter == 10'd250) begin
+		
+				if (cnt20 >= 5'd8 && cnt20 < 5'd20) begin
+				
+					sample[11:1] <= sample[10:0];
+					sample[0] <= P4;
+					
+				end
+			
+			end
+			
 		end
 		
 	end
