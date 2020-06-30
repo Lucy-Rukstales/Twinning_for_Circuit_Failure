@@ -1,5 +1,5 @@
 //////////////////////////////////////////////////////
-// Date: 				6/29/2020
+// Date: 				6/26/2020
 // Contributors: 		Lucy Rukstales, Michaela Mitchell
 //
 // Description: 		This file allows for data collection from an analog to digital converter (ADC)
@@ -23,8 +23,7 @@ module ADC_Control(clk,rst,CS,P3,P4,P5);
 	reg [11:0]sample;
 	
 	//----------------------------------------------------
-	// Scale the clk from 50MHz to 50kHz
-	// P3 to be used as the ADC clock
+	// Create a counter to divide 50MHz to 50kHz
 	always @ (posedge clk or negedge rst) begin
 		
 		if (rst == 1'b0) counter <= 10'd0;
@@ -39,6 +38,9 @@ module ADC_Control(clk,rst,CS,P3,P4,P5);
 			
 	end
 	
+	//----------------------------------------------------
+	// Scale clock from 50MHz to 50kHz
+	// P3 to be ADC clock
 	always @ (*) begin
 		
 		if (counter == 10'd0) P3 = 1'b1;
