@@ -8,7 +8,7 @@
 // Components Used:	MIKROE-340
 //////////////////////////////////////////////////////
 
-module ADC_Control(clk,rst,CS,P3,P4,P5);
+module ADC_Control(clk,rst,CS,P3,P4,P5,sample);
 
 	input P4;  // MISO
 	input clk; // 50MHz FPGA clock
@@ -20,11 +20,11 @@ module ADC_Control(clk,rst,CS,P3,P4,P5);
 	
 	reg [9:0]counter;
 	reg [4:0]cnt20;
-	reg [11:0]sample;
+	output reg [11:0]sample; // Only for testing 12 bits
 	
 	//----------------------------------------------------
 	// Create a counter to divide 50MHz to 50kHz
-	always @ (posedge clk or negedge rst) begin
+	always @ (negedge clk or negedge rst) begin
 		
 		if (rst == 1'b0) counter <= 10'd0;
 		
@@ -43,9 +43,9 @@ module ADC_Control(clk,rst,CS,P3,P4,P5);
 	// P3 to be ADC clock
 	always @ (*) begin
 		
-		if (counter == 10'd0) P3 = 1'b1;
+		if (counter == 10'd0) P3 = 1'b0;
 		
-		else if (counter == 10'd500) P3 = 1'b0;
+		else if (counter == 10'd500) P3 = 1'b1;
 		
 	end
 		
@@ -53,7 +53,9 @@ module ADC_Control(clk,rst,CS,P3,P4,P5);
 	// Count to 20 to step through ADC initialization and data transfer
 	always @ (*) begin
 		
-		if (counter == 10'd0) begin
+		if (rst == 1'b0) cnt20 = 1'b0;
+		
+		else if (counter == 10'd0) begin
 		
 			//if (cnt20 == 5'd19) cnt20 = 1'b0;
 				
@@ -68,7 +70,7 @@ module ADC_Control(clk,rst,CS,P3,P4,P5);
 	// P5 to be used for MOSI
 	always @ (*) begin
 	
-		if (counter == 10'd500) begin
+		if (counter == 10'd0) begin
 		
 			case(cnt20)
 				0: begin // Initialization
@@ -115,23 +117,21 @@ module ADC_Control(clk,rst,CS,P3,P4,P5);
 	//----------------------------------------------------
 	// Read from the ADC, 12-bits at a time
 	// P4 to be used for MISO
-	always @ (posedge clk or negedge rst) begin
+	always @ (negedge clk or negedge rst) begin
 	
 		if (rst == 1'b0) sample <= 12'd0;
 		
-		else begin
+		else if (counter == 10'd250) begin
 		
-			if (counter == 10'd250) begin
-		
-				if (cnt20 >= 5'd8 && cnt20 < 5'd20) begin
-				
-					sample[11:1] <= sample[10:0];
-					sample[0] <= P4;
-					
-				end
+			if (cnt20 >= 5'd8 && cnt20 < 5'd20) begin
 			
+				sample[11:1] <= sample[10:0];
+				sample[0] <= P4;
+				
 			end
 			
+			else sample <= sample;
+		
 		end
 		
 	end
