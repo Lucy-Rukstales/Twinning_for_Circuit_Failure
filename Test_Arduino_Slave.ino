@@ -26,7 +26,6 @@ void setup()
   SPCR |= _BV(SPE); //Enable slave mode and SPI
   SPCR |= _BV(SPIE); //Attach interrupts
   SPCR |= _BV(CPHA); //Sample on falling edge of SCL (data mode 1)
-  SPCR |= _BV(CPOL); //SCL is idle while high
 }
 
 void loop(void)
