@@ -25,7 +25,6 @@ void setup()
   Serial.begin(9600);
   SPCR |= _BV(SPE); //Enable slave mode and SPI
   SPCR |= _BV(SPIE); //Attach interrupts
-  SPCR |= _BV(CPHA); //Sample on falling edge of SCL (data mode 1)
 }
 
 void loop(void)
