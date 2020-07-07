@@ -17,7 +17,7 @@
 
 #include<SPI.h> //SPI library
 volatile int i = 0; //volatile types to be sent to ISR
-byte myArray[1];
+byte myArray[2];
 
 void setup()
 {
@@ -28,10 +28,13 @@ void setup()
 }
 
 void loop(void){
-  if (i == 1){
-    int x = (int)myArray[0]<<8|(int)myArray[1];
+  if (i >= 1){
+    int x = (int)myArray[0];
+    x = x<<8;
+    int y = (int)myArray[1];
+    int z = x|y;
     Serial.print("Received data item from FPGA-Master: ");
-    Serial.println(x, BIN); //Binary for testing, likely hex later
+    Serial.println(z, BIN); //Binary for testing, likely hex later
     i=0;
     Serial.println("=============================================");
   }
