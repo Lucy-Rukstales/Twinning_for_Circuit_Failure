@@ -7,7 +7,6 @@
   /* SPCR, default all are zeros, set to ones in setup
     | 7    | 6    | 5    | 4    | 3    | 2    | 1    | 0    |
     | SPIE | SPE  | DORD | MSTR | CPOL | CPHA | SPR1 | SPR0 |
-
     SPIE - Enables the SPI interrupt when 1
     SPE - Enables the SPI when 1
     DORD - Sends data least Significant Bit First when 1, most Significant Bit first when 0
@@ -18,19 +17,18 @@
 
 #include<SPI.h> //SPI library
 volatile int i = 0; //volatile types to be sent to ISR
-byte myArray[2];
+byte myArray[1];
 
 void setup()
 {
   Serial.begin(9600);
   SPCR |= _BV(SPE); //Enable slave mode and SPI
   SPCR |= _BV(SPIE); //Attach interrupts
+  //SPCR |= _BV(CPHA); //Sample on falling edge of SCL (data mode 1)
 }
 
-void loop(void)
-{
-  if (i == 2)
-  {
+void loop(void){
+  if (i == 1){
     int x = (int)myArray[0]<<8|(int)myArray[1];
     Serial.print("Received data item from FPGA-Master: ");
     Serial.println(x, BIN); //Binary for testing, likely hex later
