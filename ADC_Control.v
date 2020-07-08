@@ -8,48 +8,48 @@
 // Components Used:	MIKROE-340
 //////////////////////////////////////////////////////
 
-module ADC_Control(clk,rst,CS,P3,P4,P5,storage);
+module ADC_Control(clk,rst,CS,P3,P4,P5,sample);
 
-	input P4;  // MISO
-	input clk; // 50MHz FPGA clock
-	input rst;
-	
-	output CS; // Chip Select
-	output P3; // 50kHz ADC clock
-	output P5; // MOSI
-	
-	output reg [11:0]storage;
-	
-	reg storage_size;
-	wire storage_limit;
-	
-	assign storage_limit = 1'd1;
-	
-	Read_ADC my_ADC(clk,rst,CS,P3,P4,P5,sample);
-	
-	//----------------------------------------------------
-	// Run the ADC to collect enough data to fill storage
-	always @(negedge clk or negedge rst) begin
-	
-		if (rst == 1'b0) storage <= 1'd0;
-		
-		else begin
-		
-			if (storage_size < storage_limit) begin
-				//storage[767:12] <= storage[755:0];
-				storage[11:0] <= sample;
-				storage_size <= storage_size + 1'd1;
-			end
-				
-			else storage <= storage;
-			
-		end
-		
-	end
-	
-endmodule
-
-module Read_ADC(clk,rst,CS,P3,P4,P5,sample);
+//	input P4;  // MISO
+//	input clk; // 50MHz FPGA clock
+//	input rst;
+//	
+//	output CS; // Chip Select
+//	output P3; // 50kHz ADC clock
+//	output P5; // MOSI
+//	
+//	output reg [11:0]storage;
+//	
+//	reg storage_size;
+//	wire storage_limit;
+//	
+//	assign storage_limit = 1'd1;
+//	
+//	Read_ADC my_ADC(clk,rst,CS,P3,P4,P5,sample);
+//	
+//	//----------------------------------------------------
+//	// Run the ADC to collect enough data to fill storage
+//	always @(negedge clk or negedge rst) begin
+//	
+//		if (rst == 1'b0) storage <= 1'd0;
+//		
+//		else begin
+//		
+//			if (storage_size < storage_limit) begin
+//				//storage[767:12] <= storage[755:0];
+//				storage[11:0] <= sample;
+//				storage_size <= storage_size + 1'd1;
+//			end
+//				
+//			else storage <= storage;
+//			
+//		end
+//		
+//	end
+//	
+//endmodule
+//
+//module Read_ADC(clk,rst,CS,P3,P4,P5,sample);
 	
 	input P4;  // MISO
 	input clk; // 50MHz FPGA clock
@@ -71,7 +71,7 @@ module Read_ADC(clk,rst,CS,P3,P4,P5,sample);
 		
 		else begin
 		
-			if (counter < 10'd499) counter <= counter + 1'b1;
+			if (counter < 10'd999) counter <= counter + 1'b1;
 			
 			else counter <= 1'b0;
 			
@@ -84,9 +84,15 @@ module Read_ADC(clk,rst,CS,P3,P4,P5,sample);
 	// P3 to be ADC clock
 	always @ (negedge clk) begin
 		
-		if (counter == 10'd0) P3 <= 1'b0;
+		if (rst == 1'b0) P3 <= 1'b0;
 		
-		else if (counter == 10'd250) P3 <= 1'b1;
+		else begin
+		
+			if (counter == 10'd0) P3 <= 1'b0;
+			
+			else if (counter == 10'd500) P3 <= 1'b1;
+		
+		end
 		
 	end
 		
@@ -98,14 +104,18 @@ module Read_ADC(clk,rst,CS,P3,P4,P5,sample);
 		
 		else if (counter == 10'd0) cnt20 <= cnt20 + 1'b1;
 		
+		else cnt20 <= cnt20;
+		
 	end
 	
 	//----------------------------------------------------
 	// Initialize the ADC to prepare for data transfer
 	// P5 to be used for MOSI
 	always @ (negedge clk) begin
-	
-		if (counter == 10'd0) begin
+		
+		if (rst == 1'b0) CS <= 1'b1;
+		
+		else if (counter == 10'd0 && cnt20 <= 6'd20) begin
 		
 			case(cnt20)
 				0: begin // Initialization
@@ -136,7 +146,7 @@ module Read_ADC(clk,rst,CS,P3,P4,P5,sample);
 						CS <= 1'b0;
 						P5 <= 1'b0;
 					end
-					
+				
 				20: begin
 						CS <= 1'b1;
 					end
@@ -154,20 +164,43 @@ module Read_ADC(clk,rst,CS,P3,P4,P5,sample);
 	// P4 to be used for MISO
 	always @ (negedge clk or negedge rst) begin
 	
-		if (rst == 1'b0) sample <= 12'd0;
+		if (rst == 1'b0) sample[11:0] <= 12'd0;
 		
-		else if (counter == 10'd125) begin
+		else if (counter == 10'd250) begin
 		
-			if (cnt20 >= 5'd8 && cnt20 < 5'd20) begin
+			case(cnt20)
 			
-				sample[11:1] <= sample[10:0];
-				sample[0] <= P4;
-				
-			end
-			
-			else sample <= sample;
+				8: sample[11] <= P4;
+					
+				9: sample[10] <= P4;
+					
+				10: sample[9] <= P4;
+					
+				11: sample[8] <= P4;
+					
+				12: sample[7] <= P4;
+					
+				13: sample[6] <= P4;
+					
+				14: sample[5] <= P4;
+					
+				15: sample[4] <= P4;
+					
+				16: sample[3] <= P4;
+					
+				17: sample[2] <= P4;
+					
+				18: sample[1] <= P4;
+					
+				19: sample[0] <= P4;
+					
+				default: sample <= sample;
+					
+			endcase
 		
 		end
+		
+		else sample <= sample;
 		
 	end
 	
