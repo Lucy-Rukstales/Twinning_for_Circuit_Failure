@@ -1,9 +1,9 @@
 //////////////////////////////////////////////////////
-// Date: 				7/5/2020
+// Date: 				7/8/2020
 // Contributors: 		Lucy Rukstales, Michaela Mitchell
 //
 // Description: 		This file allows for data collection from an analog to digital converter (ADC)
-//							This trial runs the ADC in PIC Mode, using a 50kHz clock
+//							This trial runs the ADC in PIC Mode, using a 100kHz clock
 //
 // Components Used:	MIKROE-340
 //////////////////////////////////////////////////////
@@ -71,7 +71,7 @@ module ADC_Control(clk,rst,CS,P3,P4,P5,sample);
 		
 		else begin
 		
-			if (counter < 10'd999) counter <= counter + 1'b1;
+			if (counter < 10'd499) counter <= counter + 1'b1;
 			
 			else counter <= 1'b0;
 			
@@ -90,7 +90,7 @@ module ADC_Control(clk,rst,CS,P3,P4,P5,sample);
 		
 			if (counter == 10'd0) P3 <= 1'b0;
 			
-			else if (counter == 10'd500) P3 <= 1'b1;
+			else if (counter == 10'd250) P3 <= 1'b1;
 		
 		end
 		
@@ -166,7 +166,7 @@ module ADC_Control(clk,rst,CS,P3,P4,P5,sample);
 	
 		if (rst == 1'b0) sample[11:0] <= 12'd0;
 		
-		else if (counter == 10'd250) begin
+		else if (counter == 10'd125) begin
 		
 			case(cnt20)
 			
