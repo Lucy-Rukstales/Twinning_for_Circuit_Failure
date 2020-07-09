@@ -102,7 +102,7 @@ module ADC_Control(clk,rst,CS,P3,P4,P5,sample);
 		
 		if (rst == 1'b0) cnt20 <= 1'b0;
 		
-		else if (counter == 10'd0) cnt20 <= cnt20 + 1'b1;
+		else if (counter == 10'd0 && cnt20 <= 6'd20) cnt20 <= cnt20 + 1'b1;
 		
 		else cnt20 <= cnt20;
 		
@@ -115,7 +115,7 @@ module ADC_Control(clk,rst,CS,P3,P4,P5,sample);
 		
 		if (rst == 1'b0) CS <= 1'b1;
 		
-		else if (counter == 10'd0 && cnt20 <= 6'd20) begin
+		else if (counter == 10'd0) begin
 		
 			case(cnt20)
 				0: begin // Initialization
