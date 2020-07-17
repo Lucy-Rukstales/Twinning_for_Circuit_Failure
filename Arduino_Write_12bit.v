@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////
 //
-// Date: 				7/16/2020
+// Date: 		7/16/2020
 //
-// Contributors: 		Lucy Rukstales, Michaela Mitchell
+// Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
-// Main Module:		ADC_Control.v
+// Main Module:		Data_Collector.v
 //
-// Description: 		This file allows for 12 bits of data to be sent to the Arduino
-//							CPOL: 0 (SCL starts low) CPHA: 1 (Sample MOSI on falling edge SCL)
+// Description: 	This file allows for 12 bits of data to be sent to the Arduino
+//			CPOL: 0 (SCL starts low) CPHA: 1 (Sample MOSI on falling edge SCL)
 //
 //////////////////////////////////////////////////////
 
