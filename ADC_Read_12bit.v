@@ -1,9 +1,12 @@
 //////////////////////////////////////////////////////
+//
 // Date: 				7/16/2020
+//
 // Contributors: 		Lucy Rukstales, Michaela Mitchell
 //
-// Description: 		This is a submodule, controlled by ADC_Control.v
-//							This file allows for 12 bits of data collection from an analog to digital converter (ADC)
+// Main Module:		ADC_Control.v
+//
+// Description: 		This file allows for 12 bits of data collection from an analog to digital converter (ADC)
 //							This runs the ADC in PIC Mode, using a 100kHz clock
 //
 //////////////////////////////////////////////////////
@@ -18,9 +21,10 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 	output reg P3; // 100kHz ADC clock
 	output reg P5; // MOSI
 	
-	reg [9:0]counter;
+	output reg [11:0]sample;
 	output reg [6:0]cnt20;
-	output reg [11:0]sample; // Only for testing 12 bits
+	
+	reg [9:0]counter;
 		
 	//----------------------------------------------------
 	// Create a counter to divide 50MHz to 100kHz
@@ -127,8 +131,7 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 		
 		else if (counter == 10'd125) begin
 		
-			case(cnt20) // pktbuffer is the size of all 20 ticks and look around those samples to make sure we're not missing something(?)
-			// check the null bit!!! It might be too chort/long or ~something~
+			case(cnt20)
 			
 				9: sample[11] <= P4;
 					
