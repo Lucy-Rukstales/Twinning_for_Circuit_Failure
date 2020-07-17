@@ -1,20 +1,20 @@
 //////////////////////////////////////////////////////
 //
-// Date: 		7/16/2020
+// Date: 				7/16/2020
 //
-// Contributors: 	Lucy Rukstales, Michaela Mitchell
+// Contributors: 		Lucy Rukstales, Michaela Mitchell
 //
 // Sub Modules:		ADC_Read_12bit.v
-//			Arduino_Write_12bit.v
+//							Arduino_Write_12bit.v
 //
-// Description: 	This file uses ADC_Read_12bit.v to collect a "user-defined" amt of data from an analog to digital converter (ADC)
-//			The data is then sent to an Arduino using Arduino_Write_12bit.v
+// Description: 		This file uses ADC_Read_12bit.v to collect a "user-defined" amt of data from an analog to digital converter (ADC)
+//							The data is then sent to an Arduino using Arduino_Write_12bit.v
 //
 // Components Used:	MIKROE-340
 //
 //////////////////////////////////////////////////////
 
-module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI,storage);
+module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 
 	input P4;  	 // ADC - MISO
 	input clk; 	 // 50MHz FPGA clock
@@ -27,10 +27,9 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI,storage);
 	output SS; 	 // Arduino - Chip Select
 	output MOSI; // Arduino - Parent out child in
 	
-	output reg [119:0]storage;
-	
 	reg collection_status;
 	
+	reg [119:0]storage;
 	reg [11:0]Arduino_Sample;  // Current 12-bit sample for Arduino
 	reg [3:0]collected_amt;    // Number of samples from the ADC
 	reg [3:0]transmitted_amt;  // Number of samples sent to the Arduino
@@ -67,15 +66,24 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI,storage);
 			
 		end
 		
-		else if (collected_amt == storage_limit) collection_status <= 1'b1;
+		else if (collected_amt == storage_limit) begin
 		
-		else if (collection_status == 1'b1 && SCLtracker == 6'd0 && transmitted_amt <= storage_limit) begin
-		
-			Arduino_Sample[11:0] <= storage[119:108];
-			storage[107:12] <= storage[11:0];
-			transmitted_amt <= transmitted_amt + 4'd1;
+			collection_status <= 1'b1;
+			
+			if (SCLtracker == 6'd1 && transmitted_amt <= storage_limit) begin
+			
+				Arduino_Sample[11:0] <= 12'b011001000111;
+				//Arduino_Sample[11:0] <= storage[119:108];
+				//storage[119:12] <= storage[107:0]
+				transmitted_amt <= transmitted_amt + 4'd1;
+				
+			end
+			
+			if (transmitted_amt == storage_limit) collection_status <= 1'b0;
 			
 		end
+		
+		//else if (transmitted_amt == storage_limit) collection_status <= 1'b0;
 		
 	end
 	
