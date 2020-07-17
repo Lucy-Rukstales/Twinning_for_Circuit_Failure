@@ -40,14 +40,14 @@ module ADC_Control(clk,rst,CS,P3,P4,P5,storage);
 	
 		if (rst == 1'b0) begin 
 		
-			storage[11:0] <= 12'd0;
+			storage[119:0] <= 120'd0;
 			stored_amount <= 4'd0;
 			
 		end
 		
 		else if (cnt20 == 7'd21 && stored_amount <= storage_limit) begin
 		
-			storage[119:11] <= storage[107:0];
+			storage[119:12] <= storage[107:0];
 			storage[11:0] <= sample[11:0];
 			stored_amount <= stored_amount + 1'd1;
 			
