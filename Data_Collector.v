@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////
 //
-// Date: 				7/16/2020
+// Date: 				7/17/2020
 //
 // Contributors: 		Lucy Rukstales, Michaela Mitchell
 //
@@ -26,7 +26,7 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 	output SCL;  // Arduino - 100kHz clk
 	output SS; 	 // Arduino - Chip Select
 	output MOSI; // Arduino - Parent out child in
-	
+
 	reg collection_status;
 	
 	reg [119:0]storage;
@@ -66,45 +66,21 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 			
 		end
 		
-		else if (collected_amt == storage_limit && transmitted_amt <= storage_limit) begin
-		
-			collection_status <= 1'b1;
+		else if (collected_amt == storage_limit) begin
 			
-			if (SCLtracker == 6'd1) begin
-			
-				Arduino_Sample[11:0] <= 12'b011001000111;
-				//Arduino_Sample[11:0] <= storage[119:108];
-				//storage[119:12] <= storage[107:0]
+			if (SCLtracker == 6'd0 && transmitted_amt < storage_limit) begin
+
+				Arduino_Sample[11:0] <= storage[119:108];
+				storage[119:12] <= storage[107:0];
+				collection_status <= 1'b1;
 				transmitted_amt <= transmitted_amt + 4'd1;
 				
 			end
 			
-			else if (SCLtracker == 6'd36) collection_status <= 1'b0;
+			else if (SCLtracker >= 6'd36 || transmitted_amt == storage_limit) collection_status <= 1'b0;
 			
 		end
 		
-		//else if (transmitted_amt == storage_limit) collection_status <= 1'b0;
-		
 	end
-	
-//	//----------------------------------------------------
-//	// Transmit data to the Arduino 12-bits at a time
-//	always @(posedge clk or negedge collection_status) begin
-//		
-//		if (collection_status == 1'b0) begin
-//			
-//			transmitted_amt <= 4'd0;
-//			
-//		end
-//		
-//		else if (SCLtracker == 6'd0 && transmitted_amt <= storage_limit) begin
-//		
-//			Arduino_Sample[11:0] <= storage[119:108];
-//			storage[107:12] <= storage[11:0];
-//			transmitted_amt <= transmitted_amt + 4'd1;
-//			
-//		end
-//		
-//	end
 	
 endmodule
