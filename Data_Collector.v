@@ -66,11 +66,11 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 			
 		end
 		
-		else if (collected_amt == storage_limit) begin
+		else if (collected_amt == storage_limit && transmitted_amt <= storage_limit) begin
 		
 			collection_status <= 1'b1;
 			
-			if (SCLtracker == 6'd1 && transmitted_amt <= storage_limit) begin
+			if (SCLtracker == 6'd1) begin
 			
 				Arduino_Sample[11:0] <= 12'b011001000111;
 				//Arduino_Sample[11:0] <= storage[119:108];
@@ -79,7 +79,7 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 				
 			end
 			
-			if (transmitted_amt == storage_limit) collection_status <= 1'b0;
+			else if (SCLtracker == 6'd36) collection_status <= 1'b0;
 			
 		end
 		
