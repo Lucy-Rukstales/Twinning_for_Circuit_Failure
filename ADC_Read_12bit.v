@@ -1,13 +1,13 @@
 //////////////////////////////////////////////////////
 //
-// Date: 				7/16/2020
+// Date: 		7/16/2020
 //
-// Contributors: 		Lucy Rukstales, Michaela Mitchell
+// Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
-// Main Module:		ADC_Control.v
+// Main Module:		Data_Collector.v
 //
-// Description: 		This file allows for 12 bits of data collection from an analog to digital converter (ADC)
-//							This runs the ADC in PIC Mode, using a 100kHz clock
+// Description: 	This file allows for 12 bits of data collection from an analog to digital converter (ADC)
+//			This runs the ADC in PIC Mode, using a 100kHz clock
 //
 //////////////////////////////////////////////////////
 
