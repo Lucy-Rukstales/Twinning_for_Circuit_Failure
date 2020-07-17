@@ -24,7 +24,7 @@ module ADC_Control(clk,rst,CS,P3,P4,P5,storage);
 	
 	output reg [119:0]storage;
 	
-	reg [3:0]storage_size;
+	reg [3:0]stored_amount;
 	
 	wire [11:0]sample;
 	wire [6:0]cnt20;
@@ -41,15 +41,15 @@ module ADC_Control(clk,rst,CS,P3,P4,P5,storage);
 		if (rst == 1'b0) begin 
 		
 			storage[11:0] <= 12'd0;
-			storage_size <= 4'd0;
+			stored_amount <= 4'd0;
 			
 		end
 		
-		else if (cnt20 == 7'd21 && storage_size <= storage_limit) begin
+		else if (cnt20 == 7'd21 && stored_amount <= storage_limit) begin
 		
 			storage[119:11] <= storage[107:0];
 			storage[11:0] <= sample[11:0];
-			storage_size <= storage_size + 1'd1;
+			stored_amount <= stored_amount + 1'd1;
 			
 		end
 		
