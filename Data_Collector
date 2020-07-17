@@ -1,19 +1,20 @@
 //////////////////////////////////////////////////////
 //
-// Date: 				7/16/2020
+// Date: 		7/16/2020
 //
-// Contributors: 		Lucy Rukstales, Michaela Mitchell
+// Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
 // Sub Modules:		ADC_Read_12bit.v
-//							Arduino_Write_12bit.v
+//			Arduino_Write_12bit.v
 //
-// Description: 		This file uses ADC_Read_12bit.v to collect a "user-defined" amt of data from an analog to digital converter (ADC)
+// Description: 	This file uses ADC_Read_12bit.v to collect a "user-defined" amt of data from an analog to digital converter (ADC)
+//			The data is then sent to an Arduino using Arduino_Write_12bit.v
 //
 // Components Used:	MIKROE-340
 //
 //////////////////////////////////////////////////////
 
-module ADC_Control(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI,storage);
+module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI,storage);
 
 	input P4;  	 // ADC - MISO
 	input clk; 	 // 50MHz FPGA clock
