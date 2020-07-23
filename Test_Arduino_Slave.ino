@@ -7,13 +7,12 @@
 
 #include<SPI.h> //SPI library
 volatile int i = 0; //volatile types to be sent to ISR
-byte twelveBitArray[2]; //temporary storage array from ISR (2 bytes for each 12 bit sample)
+volatile byte twelveBitArray[2]; //temporary storage array from ISR (2 bytes for each 12 bit sample)
 
 
-const int numberOfSamples = 1; //Change based on how much data user wishes to collect
+const int numberOfSamples = 4; //Change based on how much data user wishes to collect
 int sampleNumber = 0; //Intialize counter
 int storedData[numberOfSamples] = {0}; //Final storage array
-int x, y;
 
 void setup() {
   Serial.begin(9600);
@@ -22,30 +21,42 @@ void setup() {
 }
 
 void loop(void) {
+
   if (i >= 1) {
-    
     //Store new sample in storage array, print it out if finished
-    if (sampleNumber < numberOfSamples) {
-      x = (int)twelveBitArray[0];
-      x = x << 8;
-      delay(50);
-      y = (int)twelveBitArray[1];
-      noInterrupts();
-      storedData[sampleNumber] = x | y;
-      sampleNumber = sampleNumber + 1;
-      interrupts();
-    }else if (sampleNumber == numberOfSamples) {
-      noInterrupts();
-      Serial.print(sampleNumber);
-      Serial.println(" samples have been stored: ");
-      for (int j = 0; j < sampleNumber; j++) {
-        Serial.println(storedData[j],BIN);
-      }
-      interrupts();
-    }
+    int x = (int)twelveBitArray[0];
+    delay(10);
+    x = x << 8;
+    delay(10);
+    int y = (int)twelveBitArray[1];
+    delay(10);
+    noInterrupts();
+    int z = x | y;
     
+    storedData[sampleNumber] = z;
+    sampleNumber++;  
+    if (sampleNumber == numberOfSamples) {
+      for (int j = 0; j < sampleNumber; j++) {
+        Serial.println(storedData[j], BIN);
+      }
+      sampleNumber++;
+    }
+    interrupts();
+
     i = 0;
   }
+
+  //  noInterrupts();
+  //  if (sampleNumber == numberOfSamples) {
+  //
+  //    Serial.print(sampleNumber);
+  //    Serial.println(" samples have been stored: ");
+  //    for (int j = 0; j < sampleNumber; j++) {
+  //      Serial.println(storedData[j], BIN);
+  //    }
+  //    sampleNumber++;
+  //  }
+  //  interrupts();
 }
 
 ISR (SPI_STC_vect)   //Interrput service "routine SPI transfer complete vector"
