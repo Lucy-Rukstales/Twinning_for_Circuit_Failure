@@ -39,11 +39,11 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 	wire [5:0]SCLtracker;
 	wire [3:0]storage_limit;   // User-defined amount of data to collect from ADC
 	
-	assign storage_limit = 4'd10;
+	assign storage_limit = 4'd4;
 	
 	ADC_Read_12bit my_ADC(clk,rst,CS,P3,P4,P5,ADC_Sample,cnt20);
 	
-	Arduino_Write_12bit my_Arduino(clk,collection_status,Arduino_Sample,SCL,SS,MOSI,SCLtracker);
+	Arduino_Write_12bit my_Arduino(.clk(clk),.rst(collection_status),.sample(Arduino_Sample),.SCL(SCL),.SS(SS),.MOSI(MOSI),.SCLtracker(SCLtracker));
 	
 	//----------------------------------------------------
 	// Collect data from the ADC 12-bits at a time
@@ -55,29 +55,44 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 			collected_amt <= 4'd0;
 			transmitted_amt <= 4'd0;
 			collection_status <= 1'b0;
+			Arduino_Sample <= 12'd0;
 			
 		end
 		
 		else if (cnt20 == 7'd21 && collected_amt < storage_limit) begin
 		
-			storage[119:12] <= storage[107:0];
-			storage[11:0] <= ADC_Sample[11:0];
+			storage[119:0] <= {storage[107:0],ADC_Sample[11:0]}; // THIS WORKS
 			collected_amt <= collected_amt + 4'd1;
 			
 		end
 		
-		else if (collected_amt == storage_limit) begin
+		else if (collected_amt == storage_limit && transmitted_amt < storage_limit) begin
 			
-			if (SCLtracker == 6'd0 && transmitted_amt < storage_limit) begin
-
-				Arduino_Sample[11:0] <= storage[119:108];
-				storage[119:12] <= storage[107:0];
+			if (SCLtracker == 6'd0) begin
+			
+				Arduino_Sample[11:0] <= storage[11:0];			
 				collection_status <= 1'b1;
-				transmitted_amt <= transmitted_amt + 4'd1;
 				
 			end
 			
-			else if (SCLtracker >= 6'd36 || transmitted_amt == storage_limit) collection_status <= 1'b0;
+			else if (SCLtracker == 6'd1) begin
+			
+				storage[119:0] <= {12'b000000000000,storage[119:12]};
+				collection_status <= 1'b1;
+			
+			end
+				
+			
+			else if (SCLtracker > 6'd1 && SCLtracker < 6'd37) collection_status <= 1'b1; // must be 36
+			
+			else if (SCLtracker == 6'd37 && collection_status == 1'b1) begin // must be an else
+			
+				collection_status <= 1'b0; // must be included
+				transmitted_amt <= transmitted_amt + 1'b1;
+				
+			end
+			
+			else collection_status <= 1'b0; // must be included	
 			
 		end
 		
