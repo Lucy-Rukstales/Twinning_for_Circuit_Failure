@@ -39,7 +39,7 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 	wire [5:0]SCLtracker;
 	wire [3:0]storage_limit;   // User-defined amount of data to collect from ADC
 	
-	assign storage_limit = 4'd4;
+	assign storage_limit = 4'd1;
 	
 	ADC_Read_12bit my_ADC(clk,rst,CS,P3,P4,P5,ADC_Sample,cnt20);
 	
@@ -69,23 +69,23 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 		else if (collected_amt == storage_limit && transmitted_amt < storage_limit) begin
 			
 			if (SCLtracker == 6'd0) begin
-			
-				Arduino_Sample[11:0] <= storage[11:0];			
+				
+				Arduino_Sample[11:0] <= storage[11:0];	
 				collection_status <= 1'b1;
 				
 			end
 			
 			else if (SCLtracker == 6'd1) begin
 			
-				storage[119:0] <= {12'b000000000000,storage[119:12]};
+				storage[107:0] <= storage[119:12];
 				collection_status <= 1'b1;
 			
 			end
 				
 			
-			else if (SCLtracker > 6'd1 && SCLtracker < 6'd37) collection_status <= 1'b1; // must be 36
+			else if (SCLtracker > 6'd1 && SCLtracker < 6'd38) collection_status <= 1'b1; // must be 36
 			
-			else if (SCLtracker == 6'd37 && collection_status == 1'b1) begin // must be an else
+			else if (SCLtracker == 6'd38 && collection_status == 1'b1) begin // must be an else
 			
 				collection_status <= 1'b0; // must be included
 				transmitted_amt <= transmitted_amt + 1'b1;
