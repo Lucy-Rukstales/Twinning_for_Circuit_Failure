@@ -80,7 +80,7 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 		// Send data to Arduino until storage is emptied
 		else if (transmitted_amt < storage_limit) begin
 			
-			if (SCLtracker >= 6'd0 && SCLtracker < 6'd36) begin
+			if (SCLtracker < 6'd36) begin
 				
 				Arduino_Sample[11:0] <= storage[1199:1188];	
 				transmission_status <= 1'b1;
