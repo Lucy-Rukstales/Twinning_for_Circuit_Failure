@@ -66,7 +66,8 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 			
 			else if (cnt20 == 7'd21) begin
 			
-				storage[1199:0] <= {storage[1187:0],ADC_Sample[11:0]};
+				storage <= storage << 12'd12;
+				storage[11:0] <= ADC_Sample[11:0];
 				collected_amt <= collected_amt + 7'd1;
 				collection_status <= 1'b0;
 				
