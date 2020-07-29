@@ -29,7 +29,7 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 
 	reg collection_status;
 	
-	reg [119:0]storage;
+	reg [143:0]storage;
 	reg [11:0]Arduino_Sample;  // Current 12-bit sample for Arduino
 	reg [3:0]collected_amt;    // Number of samples from the ADC
 	reg [3:0]transmitted_amt;  // Number of samples sent to the Arduino
@@ -51,7 +51,7 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 
 		if (rst == 1'b0) begin 
 		
-			storage[119:0] <= 120'd0;
+			storage[143:0] <= 144'd0;
 			collected_amt <= 4'd0;
 			transmitted_amt <= 4'd0;
 			collection_status <= 1'b0;
@@ -61,30 +61,30 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 		
 		else if (cnt20 == 7'd21 && collected_amt < storage_limit) begin
 		
-			storage[119:0] <= {storage[107:0],ADC_Sample[11:0]}; // THIS WORKS
-			//storage[11:0] <= ADC_Sample[11:0];
+			storage[143:0] <= {storage[131:0],ADC_Sample[11:0]}; // THIS WORKS
+			//storage <= storage << 12'd12; // TEMP
+			//storage[11:0] <= ADC_Sample[11:0]; // TEMP
 			collected_amt <= collected_amt + 4'd1;
 			
 		end
 		
 		else if (collected_amt == storage_limit && transmitted_amt < storage_limit) begin
 			
-			if (SCLtracker == 6'd0) begin
+			if (SCLtracker >= 6'd0 && SCLtracker < 6'd36) begin
 				
 				Arduino_Sample[11:0] <= storage[95:84];	
 				collection_status <= 1'b1;
 				
 			end				
 			
-			else if (SCLtracker > 6'd0 && SCLtracker < 6'd37) collection_status <= 1'b1; // must be 36
+			//else if (SCLtracker > 6'd0 && SCLtracker < 6'd37) collection_status <= 1'b1; // must be 36
 			
-			else if (SCLtracker == 6'd37 && collection_status == 1'b1) begin // must be an else
+			else if (SCLtracker == 6'd36 && collection_status == 1'b1) begin // must be an else
 			
 				collection_status <= 1'b0; // must be included
 				transmitted_amt <= transmitted_amt + 1'b1;
-				storage[119:0] <= {storage[107:0],12'b0};
-				//storage[11:0] <= storage[23:12];
-				//storage[119:0] <= {12'b000000000000,storage[119:12]};
+				//storage[143:0] <= {storage[131:0],12'b0};
+				storage <= storage << 12'd12; // TEMP
 				
 			end
 			
