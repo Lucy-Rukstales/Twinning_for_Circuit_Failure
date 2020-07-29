@@ -1,10 +1,10 @@
 //////////////////////////////////////////////////////
 //
-// Date: 		7/16/2020
+// Date: 		7/29/2020
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
-// Main Module:		Data_Collector.v
+// Top Module:		Data_Collector.v
 //
 // Description: 	This file allows for 12 bits of data to be sent to the Arduino
 //			CPOL: 0 (SCL starts low) CPHA: 1 (Sample MOSI on falling edge SCL)
@@ -13,22 +13,23 @@
 
 module Arduino_Write_12bit(clk,rst,sample,SCL,SS,MOSI,SCLtracker);
 
-	input clk; //On board 50MHz clk
-	input rst; //Manual switch
+	input clk; // FPGA - 50MHz clk
+	input rst; // Reset Switch
 	
-	input [11:0]sample;
+	input [11:0]sample; // 12-bit data sample
 	
-	output reg SCL;  //Clk line to sync data transfer
-	output reg SS;   //Child select line
-	output reg MOSI; //Parent out child in
+	output reg SCL;  // Arduino - 100kHz clock
+	output reg SS;   // Slave/child select
+	output reg MOSI; // Data for Arduino
 
-	output reg [5:0]SCLtracker;
+	output reg [5:0]SCLtracker; // Counter to step through Arduino control
 	
-	reg [7:0]countSCL; // 100kHz clk
+	reg [7:0]countSCL; // Counter to establish 100kHz ADC clock
 	
 	//----------------------------------------------------	
 	always @ (posedge clk or negedge rst) begin
 	
+		// Clears everything
 		if (rst == 1'b0) begin
 		
 			countSCL <= 8'd0;
