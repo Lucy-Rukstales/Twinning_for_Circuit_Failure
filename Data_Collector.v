@@ -27,8 +27,8 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 	output SS; 	 // Arduino - Chip Select
 	output MOSI; // Arduino - Parent out child in
 
-	reg collect_status;
-	reg transmit_status;
+	reg collection_status;
+	reg transmission_status;
 	
 	reg [1199:0]storage;
 	reg [11:0]Arduino_Sample;  // Current 12-bit sample for Arduino
@@ -42,49 +42,50 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 	
 	assign storage_limit = 7'd100;
 	
-	ADC_Read_12bit my_ADC(clk,collect_status,CS,P3,P4,P5,ADC_Sample,cnt20);
+	ADC_Read_12bit my_ADC(clk,collection_status,CS,P3,P4,P5,ADC_Sample,cnt20);
 	
-	Arduino_Write_12bit my_Arduino(clk,transmit_status,Arduino_Sample,SCL,SS,MOSI,SCLtracker);
+	Arduino_Write_12bit my_Arduino(clk,transmission_status,Arduino_Sample,SCL,SS,MOSI,SCLtracker);
 	
 	//----------------------------------------------------
 	// Collect data from the ADC 12-bits at a time
+	// Send data to the Arduino 12-bits at a time
 	always @(posedge clk or negedge rst) begin
 
 		if (rst == 1'b0) begin 
 		
 			storage[1199:0] <= 1200'd0;
 			collected_amt <= 7'd0; transmitted_amt <= 7'd0;
-			collect_status <= 1'b0; transmit_status <= 1'b0;
+			collection_status <= 1'b0; transmission_status <= 1'b0;
 			Arduino_Sample <= 12'd0;
 			
 		end
 		
 		else if (collected_amt < storage_limit) begin
 			
-			if(cnt20 == 7'd0) collect_status <= 1'b1;
+			if (cnt20 == 7'd0) collection_status <= 1'b1;
 			
-			else if(cnt20 == 7'd21) begin
+			else if (cnt20 == 7'd21) begin
 			
 				storage[1199:0] <= {storage[1187:0],ADC_Sample[11:0]};
 				collected_amt <= collected_amt + 7'd1;
-				collect_status <= 1'b0;
+				collection_status <= 1'b0;
 				
 			end
 			
 		end
 		
-		else if (collected_amt == storage_limit && transmitted_amt < storage_limit) begin
+		else if (transmitted_amt < storage_limit) begin
 			
 			if (SCLtracker >= 6'd0 && SCLtracker < 6'd36) begin
 				
 				Arduino_Sample[11:0] <= storage[1199:1188];	
-				transmit_status <= 1'b1;
+				transmission_status <= 1'b1;
 				
 			end				
 			
-			else if (SCLtracker == 6'd36 && transmit_status == 1'b1) begin
+			else if (transmission_status == 1'b1) begin
 			
-				transmit_status <= 1'b0;
+				transmission_status <= 1'b0;
 				transmitted_amt <= transmitted_amt + 7'd1;
 				storage <= storage << 12'd12;
 				
