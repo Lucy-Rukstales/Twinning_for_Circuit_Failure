@@ -29,13 +29,9 @@ void loop(void) { // variable "processupto"
       } else {
         y = (int)twelveBitArray[j];
         sample[j / 2] = x | y;
-      }//Serial.println(twelveBitArray[j],BIN);
-    }
-    for (int k = 0; k < numberOfSamples; k++) {
-//      Serial.print(k);
-//      Serial.print(": ");
-//      Serial.println(sample[k], BIN);
-      Serial.println(((double)sample[k]/4096.0)*5.0);
+      }
+    } for (int k = 0; k < numberOfSamples; k++) {
+      Serial.println(((double)sample[k] / 4096.0) * 5.0);
       delay(5000);
     }
     interrupts();
@@ -43,8 +39,7 @@ void loop(void) { // variable "processupto"
   }
 }
 
-ISR (SPI_STC_vect)   //Interrput service "routine SPI transfer complete vector" // this is fine as is // turn of ISR when get to 4096
-{
+ISR (SPI_STC_vect) {  //Interrput service "routine SPI transfer complete vector" // this is fine as is // turn of ISR when get to 4096
   twelveBitArray[i] = SPDR; //SPDR: SPI Data Register (Sampled data from MOSI)
   i++;
 }
