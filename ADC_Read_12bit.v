@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////
 //
-// Date: 		7/16/2020
+// Date: 		7/29/2020
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
@@ -63,9 +63,9 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 	// Count to 20 to step through ADC initialization and data transfer
 	always @ (posedge clk or negedge rst) begin
 		
-		if (rst == 1'b0) cnt20 <= 1'b0;
+		if (rst == 1'b0) cnt20 <= 7'd0;
 		
-		else if (counter == 10'd0 && cnt20 <= 7'd21) cnt20 <= cnt20 + 1'b1;
+		else if (counter == 10'd0 && cnt20 <= 7'd21) cnt20 <= cnt20 + 7'd1;
 		
 		else cnt20 <= cnt20;
 		
@@ -129,39 +129,7 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 	
 		if (rst == 1'b0) sample[11:0] <= 12'd0;
 		
-		else if (counter == 10'd125) begin
-		
-			case(cnt20)
-			
-				9: sample[11] <= P4;
-					
-				10: sample[10] <= P4;
-				
-				11: sample[9] <= P4;
-					
-				12: sample[8] <= P4;
-				
-				13: sample[7] <= P4;
-					
-				14: sample[6] <= P4;
-					
-				15: sample[5] <= P4;
-					
-				16: sample[4] <= P4;
-					
-				17: sample[3] <= P4;
-					
-				18: sample[2] <= P4;
-					
-				19: sample[1] <= P4;
-					
-				20: sample[0] <= P4;
-					
-				default: sample <= sample;
-					
-			endcase
-		
-		end
+		else if (counter == 10'd125 && cnt20 > 7'd8 && cnt20 < 7'd21) sample[11:0] <= {sample[10:0],P4};
 		
 		else sample <= sample;
 		
