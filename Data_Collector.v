@@ -66,7 +66,7 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 			
 			else if(cnt20 == 7'd21) begin
 			
-				storage[1199:0] <= {storage[1187:0],ADC_Sample[11:0]}; // THIS WORKS
+				storage[1199:0] <= {storage[1187:0],ADC_Sample[11:0]};
 				collected_amt <= collected_amt + 7'd1;
 				read_status <= 1'b0;
 				
@@ -83,15 +83,13 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 				
 			end				
 			
-			else if (SCLtracker == 6'd36 && collection_status == 1'b1) begin // must be an else
+			else if (SCLtracker == 6'd36 && collection_status == 1'b1) begin
 			
-				collection_status <= 1'b0; // must be included
+				collection_status <= 1'b0;
 				transmitted_amt <= transmitted_amt + 7'd1;
-				storage <= storage << 12'd12; // TEMP
+				storage <= storage << 12'd12;
 				
 			end
-			
-			else collection_status <= 1'b0; // must be included	
 			
 		end
 		
