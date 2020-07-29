@@ -4,7 +4,7 @@
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
-// Main Module:		Data_Collector.v
+// Top Module:		Data_Collector.v
 //
 // Description: 	This file allows for 12 bits of data collection from an analog to digital converter (ADC)
 //			This runs the ADC in PIC Mode, using a 100kHz clock
@@ -13,21 +13,21 @@
 
 module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 	
-	input P4;  // MISO
-	input clk; // 50MHz FPGA clock
-	input rst;
+	input P4;  // MISO - Data from ADC
+	input clk; // FPGA - 50MHz clock
+	input rst; // Reset switch
 	
-	output reg CS; // Chip Select
-	output reg P3; // 100kHz ADC clock
-	output reg P5; // MOSI
+	output reg CS; // Chip Select - Turns ADC on
+	output reg P3; // ADC - 100kHz clock
+	output reg P5; // MOSI - Control data for ADC
 	
-	output reg [11:0]sample;
-	output reg [6:0]cnt20;
+	output reg [11:0]sample; // 12-bit data sample
+	output reg [6:0]cnt20;   // Counter to step through ADC control
 	
-	reg [9:0]counter;
+	reg [9:0]counter; // Counter to establish 100kHz ADC clock
 		
 	//----------------------------------------------------
-	// Create a counter to divide 50MHz to 100kHz
+	// Create a counter to divide 50MHz FPGA clock to 100kHz ADC clock
 	always @ (posedge clk or negedge rst) begin
 		
 		if (rst == 1'b0) counter <= 10'd0;
