@@ -1,9 +1,16 @@
-// FPGA-Arduino SPI Protocol
-// Arduino Child
-
-//Notes:
-//Pin defintions (SCL, MOSI, SS) are inherently defined when SPI slave mode enabled (from datasheet)
-//SPCR is the "SPI Control Register"
+//////////////////////////////////////////////////////
+//
+// Date:          7/29/2020
+//
+// Contributors:  Lucy Rukstales, Michaela Mitchell
+//
+// Description:`  This file utilizes SPI Protocols to collect data from the FPGA.
+//                The FPGA is the master/parent while the Arduino is the slave/child.
+//
+// Notes:         Pin defintions (SCL, MOSI, SS) are inherently defined when SPI slave mode enabled (from datasheet).
+//                SPCR is the "SPI Control Register"
+//
+//////////////////////////////////////////////////////
 
 #include<SPI.h> //SPI library
 volatile int i = 0; //volatile types to be sent to ISR
@@ -31,7 +38,8 @@ void loop(void) { // variable "processupto"
         sample[j / 2] = x | y;
       }
     } for (int k = 0; k < numberOfSamples; k++) {
-      Serial.println(((double)sample[k] / 4096.0) * 5.0);
+      Serial.println(sample[k]);
+      //Serial.println(((double)sample[k] / 4096.0) * 5.0);
       delay(5000);
     }
     interrupts();
