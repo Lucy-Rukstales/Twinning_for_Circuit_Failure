@@ -4,7 +4,7 @@
 //
 // Contributors:  Lucy Rukstales, Michaela Mitchell
 //
-// Description:`  This file utilizes SPI Protocols to collect data from the FPGA.
+// Description:   This file utilizes SPI Protocols to collect data from the FPGA.
 //                The FPGA is the master/parent while the Arduino is the slave/child.
 //
 // Notes:         Pin defintions (SCL, MOSI, SS) are inherently defined when SPI slave mode enabled (from datasheet).
