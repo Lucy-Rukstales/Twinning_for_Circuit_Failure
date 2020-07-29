@@ -15,15 +15,8 @@ int x, y, z;
 
 void setup() {
   Serial.begin(9600);
-  SPCR |= bit(SPE);
-  //SPCR |= _BV(SPE); //Enable slave mode and SPI
-  //SPCR |= _BV(SPIE); //Attach interrupts
-
-  pinMode(SCL, INPUT);
-  pinMode(MOSI, INPUT);
-  pinMode(SS, INPUT);
-
-  SPI.attachInterrupt();
+  SPCR |= _BV(SPE); //Enable slave mode and SPI
+  SPCR |= _BV(SPIE); //Attach interrupts
 }
 
 void loop(void) { // variable "processupto"
