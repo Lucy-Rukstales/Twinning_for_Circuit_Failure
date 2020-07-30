@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////
 //
-// Date: 		7/29/2020
+// Date: 		7/30/2020
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
@@ -18,32 +18,32 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 	input rst; // Reset switch
 	
 	output reg CS; // Chip Select - Turns ADC on
-	output reg P3; // ADC - 100kHz clock
+	output reg P3; // ADC - 2MkHz clock
 	output reg P5; // MOSI - Control data for ADC
 	
 	output reg [11:0]sample; // 12-bit data sample
 	output reg [6:0]cnt20;   // Counter to step through ADC control
 	
-	reg [9:0]counter; // Counter to establish 100kHz ADC clock
+	reg [4:0]counter; // Counter to establish 100kHz ADC clock
 		
 	//----------------------------------------------------
-	// Create a counter to divide 50MHz FPGA clock to 100kHz ADC clock
+	// Create a counter to divide 50MHz FPGA clock to roughly 2MHz ADC clock
 	always @ (posedge clk or negedge rst) begin
 		
-		if (rst == 1'b0) counter <= 10'd0;
+		if (rst == 1'b0) counter <= 5'd0;
 		
 		else begin
 		
-			if (counter < 10'd499) counter <= counter + 1'b1;
+			if (counter < 5'd27) counter <= counter + 5'd1;
 			
-			else counter <= 1'b0;
+			else counter <= 5'd0;
 			
 		end
 			
 	end
 	
 	//----------------------------------------------------
-	// Scale clock from 50MHz to 100kHz
+	// Scale clock from 50MHz to roughly 2MkHz
 	// P3 to be ADC clock
 	always @ (posedge clk or negedge rst) begin
 		
@@ -51,9 +51,9 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 		
 		else begin
 		
-			if (counter == 10'd0) P3 <= 1'b0;
+			if (counter == 5'd0) P3 <= 1'b0;
 			
-			else if (counter == 10'd250) P3 <= 1'b1;
+			else if (counter == 5'd14) P3 <= 1'b1;
 		
 		end
 		
@@ -65,7 +65,7 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 		
 		if (rst == 1'b0) cnt20 <= 7'd0;
 		
-		else if (counter == 10'd0 && cnt20 <= 7'd21) cnt20 <= cnt20 + 7'd1;
+		else if (counter == 5'd0 && cnt20 <= 7'd21) cnt20 <= cnt20 + 7'd1;
 		
 		else cnt20 <= cnt20;
 		
@@ -78,7 +78,7 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 		
 		if (rst == 1'b0) CS <= 1'b1;
 		
-		else if (counter == 10'd0) begin
+		else if (counter == 5'd0) begin
 		
 			case(cnt20)
 				0: begin // Initialization
@@ -129,7 +129,7 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 	
 		if (rst == 1'b0) sample[11:0] <= 12'd0;
 		
-		else if (counter == 10'd125 && cnt20 > 7'd8 && cnt20 < 7'd21) sample[11:0] <= {sample[10:0],P4};
+		else if (counter == 5'd7 && cnt20 > 7'd8 && cnt20 < 7'd21) sample[11:0] <= {sample[10:0],P4};
 		
 		else sample <= sample;
 		
