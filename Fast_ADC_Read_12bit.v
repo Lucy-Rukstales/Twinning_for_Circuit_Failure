@@ -7,7 +7,7 @@
 // Top Module:		Data_Collector.v
 //
 // Description: 	This file allows for 12 bits of data collection from an analog to digital converter (ADC)
-//			This runs the ADC in PIC Mode, using a 100kHz clock
+//			This runs the ADC using a 75MHz clock
 //
 //////////////////////////////////////////////////////
 
