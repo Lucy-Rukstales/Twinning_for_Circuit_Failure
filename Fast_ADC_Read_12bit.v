@@ -7,18 +7,18 @@
 // Top Module:		Data_Collector.v
 //
 // Description: 	This file allows for 12 bits of data collection from an analog to digital converter (ADC)
-//			This runs the ADC using a 75MHz clock
+//			This runs the ADC using the 12.5MHz FPGA clock
 //
 //////////////////////////////////////////////////////
 
-module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
+module ADC_Read_12bit(clk,rst,CS,P3,SDO,P5,sample,cnt20);
 	
-	input P4;  // MISO - Data from ADC
+	input SDO;  // MISO - Data from ADC
 	input clk; // FPGA - 50MHz clock
 	input rst; // Reset switch
 	
 	output reg CS; // Chip Select - Turns ADC on
-	output reg P3; // ADC - 2MkHz clock
+	output reg P3; // ADC - 50MHz clock
 	output reg P5; // MOSI - Control data for ADC
 	
 	output reg [11:0]sample; // 12-bit data sample
@@ -124,12 +124,12 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 	
 	//----------------------------------------------------
 	// Read from the ADC, 12-bits at a time
-	// P4 to be used for MISO
+	// SDO to be used for MISO
 	always @ (posedge clk or negedge rst) begin
 	
 		if (rst == 1'b0) sample[11:0] <= 12'd0;
 		
-		else if (counter == 5'd7 && cnt20 > 7'd8 && cnt20 < 7'd21) sample[11:0] <= {sample[10:0],P4};
+		else if (counter == 5'd7 && cnt20 > 7'd8 && cnt20 < 7'd21) sample[11:0] <= {sample[10:0],SDO};
 		
 		else sample <= sample;
 		
