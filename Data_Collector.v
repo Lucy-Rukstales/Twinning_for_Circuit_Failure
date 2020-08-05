@@ -4,7 +4,7 @@
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
-// Sub Modules:		ADC_Read_12bit.v
+// Sub Modules:		Slow_ADC_Read_12bit.v
 //			Arduino_Write_12bit.v
 //
 // Description: 	This file uses ADC_Read_12bit.v to collect a "user-defined" amt of data from an analog to digital converter (ADC)
