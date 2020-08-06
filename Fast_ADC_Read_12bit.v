@@ -7,7 +7,7 @@
 // Top Module:		Data_Collector.v
 //
 // Description: 	This file allows for 12 bits of data collection from an analog to digital converter (ADC)
-//			This runs the ADC using the 25MHz FPGA clock; 12-bit samples sent at roughly 1.5MHz
+//			This runs the ADC using the 25MHz FPGA clock; 12-bit samples sent at roughly 1.56MHz
 //
 //////////////////////////////////////////////////////
 
