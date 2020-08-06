@@ -64,7 +64,13 @@ module Fast_ADC_Read_12bit(clk,rst,CS,SCK,SDO,sample,cnt15);
 		
 		end
 		
-		else if (SCK == 1'd1 && (cnt15 == 5'd0 || cnt15 == 5'd15)) CS <= 1'b0;
+		else if (SCK == 1'd1) begin
+			
+			if (cnt15 == 5'd0) CS <= 1'b0;
+			
+			else if (cnt15 == 5'd15) CS <= 1'b1;
+		
+		end
 		
 		else if (SCK == 1'd0) begin
 			
