@@ -7,7 +7,7 @@
 // Top Module:		Data_Collector.v
 //
 // Description: 	This file allows for 12 bits of data collection from an analog to digital converter (ADC)
-//			This runs the ADC using the 12.5MHz clock; 12-bit samples sent at roughly 781.25kHz
+//			This runs the ADC using the 12.5MHz FPGA clock; 12-bit samples sent at roughly 781.25kHz
 //
 //////////////////////////////////////////////////////
 
@@ -82,7 +82,7 @@ module Fast_ADC_Read_12bit(clk,rst,CS,SCK,SDO,sample,cnt15);
 		
 		end
 		
-		else if (counter == 3'd2 && cnt15 == 5'd0) CS <= 1'b0;
+		else if (counter == 3'd2 && (cnt15 == 5'd0 || cnt15 == 5'd15)) CS <= 1'b0;
 		
 		else if (counter == 3'd0) begin
 			
