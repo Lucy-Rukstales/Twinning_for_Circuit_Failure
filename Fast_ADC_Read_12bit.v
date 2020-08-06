@@ -7,17 +7,17 @@
 // Top Module:		Data_Collector.v
 //
 // Description: 	This file allows for 12 bits of data collection from an analog to digital converter (ADC)
-//			This runs the ADC using the 25MHz FPGA clock; 12-bit samples sent at roughly 1.56MHz
+//			This runs the ADC using the 25MHz FPGA clock; 12-bit samples sent at roughly 1.5MHz
 //
 //////////////////////////////////////////////////////
 
 module Fast_ADC_Read_12bit(clk,rst,CS,SCK,SDO,sample,cnt15);
 	
-	input SDO;  // MISO - Data from ADC
+	input SDO; // MISO - Data from ADC
 	input clk; // FPGA - 50MHz clock
 	input rst; // Reset switch
 	
-	output reg CS; // Chip Select - Turns ADC on
+	output reg CS;  // Chip Select - Turns ADC on
 	output reg SCK; // ADC - 25MHz clock
 	
 	output reg [11:0]sample; // 12-bit data sample
