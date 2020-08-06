@@ -28,13 +28,13 @@ module Fast_ADC_Read_12bit(clk,rst,CS,SCK,SDO,sample,cnt15);
 	// SCK to be ADC clock
 	always @ (posedge clk or negedge rst) begin
 		
-		if (rst == 1'b0) SCK <= 2'd0;
+		if (rst == 1'b0) SCK <= 1'd0;
 		
 		else begin
 		
-			if (SCK == 2'd0) SCK <= 2'd1;
+			if (SCK == 1'd0) SCK <= 1'd1;
 			
-			else SCK <= 2'd0;
+			else SCK <= 1'd0;
 			
 		end
 			
@@ -46,7 +46,7 @@ module Fast_ADC_Read_12bit(clk,rst,CS,SCK,SDO,sample,cnt15);
 		
 		if (rst == 1'b0) cnt15 <= 5'd0;
 		
-		else if (SCK == 2'd0 && cnt15 <= 5'd16) cnt15 <= cnt15 + 5'd1;
+		else if (SCK == 1'd0 && cnt15 <= 5'd16) cnt15 <= cnt15 + 5'd1;
 		
 		else cnt15 <= cnt15;
 		
@@ -64,11 +64,11 @@ module Fast_ADC_Read_12bit(clk,rst,CS,SCK,SDO,sample,cnt15);
 		
 		end
 		
-		else if (SCK == 2'd1 && (cnt15 == 5'd0 || cnt15 == 5'd15)) CS <= 1'b0;
+		else if (SCK == 1'd1 && (cnt15 == 5'd0 || cnt15 == 5'd15)) CS <= 1'b0;
 		
-		else if (SCK == 2'd0) begin
+		else if (SCK == 1'd0) begin
 			
-			if (SCK == 3'd1 && cnt15 > 5'd1 && cnt15 < 5'd14) sample[11:0] <= {sample[10:0],SDO};
+			if (SCK == 1'd1 && cnt15 > 5'd1 && cnt15 < 5'd14) sample[11:0] <= {sample[10:0],SDO};
 		
 			else sample <= sample;
 			
