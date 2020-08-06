@@ -1,138 +1,97 @@
 //////////////////////////////////////////////////////
 //
-// Date: 		8/4/2020
+// Date: 		8/5/2020
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
 // Top Module:		Data_Collector.v
 //
 // Description: 	This file allows for 12 bits of data collection from an analog to digital converter (ADC)
-//			This runs the ADC using the 12.5MHz FPGA clock
+//			This runs the ADC using the 12.5MHz clock; 12-bit samples sent at roughly 781.25kHz
 //
 //////////////////////////////////////////////////////
 
-module ADC_Read_12bit(clk,rst,CS,P3,SDO,P5,sample,cnt20);
+module Fast_ADC_Read_12bit(clk,rst,CS,SCK,SDO,sample,cnt15);
 	
 	input SDO;  // MISO - Data from ADC
 	input clk; // FPGA - 50MHz clock
 	input rst; // Reset switch
 	
 	output reg CS; // Chip Select - Turns ADC on
-	output reg P3; // ADC - 50MHz clock
-	output reg P5; // MOSI - Control data for ADC
+	output reg SCK; // ADC - 12.5MHz clock
 	
 	output reg [11:0]sample; // 12-bit data sample
-	output reg [6:0]cnt20;   // Counter to step through ADC control
+	output reg [4:0]cnt15;   // Counter to step through ADC control
 	
-	reg [4:0]counter; // Counter to establish 100kHz ADC clock
+	reg [2:0]counter; // Counter to establish 12.5MHz ADC clock
 		
 	//----------------------------------------------------
-	// Create a counter to divide 50MHz FPGA clock to roughly 2MHz ADC clock
+	// Create a counter to divide 50MHz FPGA clock to 12.5MHz ADC clock
 	always @ (posedge clk or negedge rst) begin
 		
-		if (rst == 1'b0) counter <= 5'd0;
+		if (rst == 1'b0) counter <= 3'd0;
 		
 		else begin
 		
-			if (counter < 5'd27) counter <= counter + 5'd1;
+			if (counter < 3'd3) counter <= counter + 3'd1;
 			
-			else counter <= 5'd0;
+			else counter <= 3'd0;
 			
 		end
 			
 	end
 	
 	//----------------------------------------------------
-	// Scale clock from 50MHz to roughly 2MkHz
-	// P3 to be ADC clock
+	// Scale clock from 50MHz to 12.5MHz
+	// SCK to be ADC clock
 	always @ (posedge clk or negedge rst) begin
 		
-		if (rst == 1'b0) P3 <= 1'b0;
+		if (rst == 1'b0) SCK <= 1'b0;
 		
 		else begin
 		
-			if (counter == 5'd0) P3 <= 1'b0;
+			if (counter == 3'd0) SCK <= 1'b0;
 			
-			else if (counter == 5'd14) P3 <= 1'b1;
+			else if (counter == 3'd2) SCK <= 1'b1;
 		
 		end
 		
 	end
 		
 	//----------------------------------------------------
-	// Count to 20 to step through ADC initialization and data transfer
+	// Count to 15 to step through ADC initialization and data transfer
 	always @ (posedge clk or negedge rst) begin
 		
-		if (rst == 1'b0) cnt20 <= 7'd0;
+		if (rst == 1'b0) cnt15 <= 5'd0;
 		
-		else if (counter == 5'd0 && cnt20 <= 7'd21) cnt20 <= cnt20 + 7'd1;
+		else if (counter == 3'd0 && cnt15 <= 5'd16) cnt15 <= cnt15 + 5'd1;
 		
-		else cnt20 <= cnt20;
+		else cnt15 <= cnt15;
 		
 	end
 	
 	//----------------------------------------------------
-	// Initialize the ADC to prepare for data transfer
-	// P5 to be used for MOSI
-	always @ (posedge clk or negedge rst) begin
-		
-		if (rst == 1'b0) CS <= 1'b1;
-		
-		else if (counter == 5'd0) begin
-		
-			case(cnt20)
-				0: begin // Initialization
-						CS <= 1'b1;
-						P5 <= 1'b0;
-					end
-					
-				1: begin // Start Bit
-						CS <= 1'b0;
-						P5 <= 1'b1;
-					end
-					
-				2: begin // Control: Single Ended
-						CS <= 1'b0;
-						P5 <= 1'b1;
-					end
-					
-				3: begin // Control: Don't Care
-						CS <= 1'b0;
-					end
-					
-				4: begin // Control: Channel 0
-						CS <= 1'b0;
-						P5 <= 1'b0;
-					end
-					
-				5: begin // Control: Channel 0
-						CS <= 1'b0;
-						P5 <= 1'b0;
-					end
-				
-				21: begin
-						CS <= 1'b1;
-					end
-					
-				default: CS <= 1'b0;
-				
-			endcase
-			
-		end
-					
-	end
-	
-	//----------------------------------------------------
-	// Read from the ADC, 12-bits at a time
+	// Data transfer
 	// SDO to be used for MISO
 	always @ (posedge clk or negedge rst) begin
-	
-		if (rst == 1'b0) sample[11:0] <= 12'd0;
 		
-		else if (counter == 5'd7 && cnt20 > 7'd8 && cnt20 < 7'd21) sample[11:0] <= {sample[10:0],SDO};
+		if (rst == 1'b0) begin
+			
+			CS <= 1'b1;
+			sample[11:0] <= 12'd0;
 		
-		else sample <= sample;
+		end
 		
+		else if (counter == 3'd2 && cnt15 == 5'd0) CS <= 1'b0;
+		
+		else if (counter == 3'd0) begin
+			
+			if (counter == 3'd1 && cnt15 > 5'd1 && cnt15 < 5'd14) sample[11:0] <= {sample[10:0],SDO};
+		
+			else sample <= sample;
+			
+		end
+					
 	end
 	
 endmodule
