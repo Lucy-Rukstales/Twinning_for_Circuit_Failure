@@ -24,7 +24,7 @@ lengthT = 10; %Initilize and create tabu list
 tabuListT = zeros(1, lengthT);
 maxTabuSize = 10;
 
-bestSolution = 5; %Create inital solution and calculate inital solution fitness
+bestSolution = 4; %Create inital solution and calculate inital solution fitness
 bestSolutionFitness = fitness_func(bestSolution);
 
 %% Loop: create neighbours, evaluate fitness, update best solution and tabu list
@@ -39,7 +39,9 @@ while (k < 14) %Stopping condition is 14 iterations
         neighbours(1,i+length(stepsH)) = bestSolution - stepsH(1,i);
     end
     for i = 1:1:length(neighbours)
-        if ((neighbours(1,i) >= a) && (neighbours(1,i) <= b) && ~ismember(neighbours(1,i),tabuListT))
+        %fitness(1,i) = fitness_func(neighbours(i)); %Calculate fitness
+        %plot(neighbours(i), fitness(j), '.r') %Show all the points checked
+        if ((neighbours(1,i) >= a) && (neighbours(1,i) <= b)) %&& ~ismember(neighbours(1,i),tabuListT))
             feasibleMoves(1,j) = neighbours(1,i); %Reduce neighbours into feasbile x values
             fitness(1,j) = fitness_func(feasibleMoves(j)); %Calculate fitness
             plot(feasibleMoves(j), fitness(j), '.r') %Show all the points checked
