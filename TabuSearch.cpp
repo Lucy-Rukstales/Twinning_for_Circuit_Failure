@@ -1,4 +1,4 @@
-//Copyright
+// Copyright
 
 /*
  * Lucy Rukstales
@@ -25,7 +25,7 @@ bool contains(std::vector<double> list, double value) {
 }
 
 int main() {
-  //* Define the function interval, [a,b]
+  // Define the function interval, [a,b]
   const double a = 2.7;
   const double b = 7.5;
 
@@ -35,7 +35,7 @@ int main() {
     stepsH.push_back(stepsH[i-1]/10);
   }
 
-  //* Initialize and create tabu list
+  // Initialize and create tabu list
   std::vector<double> tabuListT;
   const int maxTabuSize = 10;
 
@@ -50,26 +50,28 @@ int main() {
     double bestSolution = a + test;
     double bestSolutionFitness = fitness_func(bestSolution); 
 
-    //* Loop: create neighbors, evaluate fitness, update best solution and tabu list
+    // Loop: create neighbors, evaluate fitness, update best solution and 
+    // tabu list
     int k = 0;
-    while (k < 10) {
+    while (k < 14) {
       int j = 0;
       neighbors.clear();
       feasibleMoves.clear();
       fitness.clear();
 
-      //* Add steps
-      for (int i = 0; i < (int) stepsH.size(); i++) {
+      // Add steps
+      for (int i = 0; i < static_cast<int>(stepsH.size()); i++) {
         neighbors.push_back(bestSolution + stepsH[i]);
       }
 
-      //* Subtract steps
-      for (int i = 0; i < (int) stepsH.size(); i++) {
+      // Subtract steps
+      for (int i = 0; i < static_cast<int>(stepsH.size()); i++) {
         neighbors.push_back(bestSolution - stepsH[i]);
       }
 
-      for (int i = 0; i <  (int) neighbors.size(); i++) {
-        if ((neighbors[i] >= a) && (neighbors[i] <= b) && (contains(tabuListT, neighbors[i]) == false)) { //* ??
+      for (int i = 0; i < static_cast<int>(neighbors.size()); i++) {
+        if ((neighbors[i] >= a) && (neighbors[i] <= b) && 
+          (contains(tabuListT, neighbors[i]) == false)) {
           feasibleMoves.push_back(neighbors[i]);
           fitness.push_back(fitness_func(feasibleMoves[j]));
           if (fitness[j] < bestSolutionFitness) {
@@ -91,7 +93,8 @@ int main() {
     }
   }
 
-  std::cout << "Minimum Position: (" << overallBest << ", " << overallBestFitness << ")\n";
+  std::cout << "Minimum Position: (" << overallBest << ", " 
+    << overallBestFitness << ")\n";
 
   return 0;
 }
