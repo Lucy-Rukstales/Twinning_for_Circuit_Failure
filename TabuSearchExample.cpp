@@ -50,11 +50,11 @@ int main() {
   // tabuListT vector: stores the best solution given a set of feasible moves?
   std::vector<double> tabuListT;
   const int maxTabuSize = 10;
-  
+
   // Overall best values are the function minimums
   double overallBest = a;
   double overallBestFitness = fitness_func(overallBest);
-  
+
   // Initialize vectors used in tabu search
   std::vector<double> neighbors;
   std::vector<double> fitness;
@@ -63,9 +63,9 @@ int main() {
   for (int m = 0; m < 5; m++) {
     double test = 0.96*m;
     double bestSolution = a + test;
-    double bestSolutionFitness = fitness_func(bestSolution); 
+    double bestSolutionFitness = fitness_func(bestSolution);
 
-    // Loop: create neighbors, evaluate fitness, update best solution and 
+    // Loop: create neighbors, evaluate fitness, update best solution and
     // tabu list
     int k = 0;
     while (k < 14) {
@@ -74,13 +74,14 @@ int main() {
       feasibleMoves.clear();
       fitness.clear();
 
-      // Add/subtract steps
-      for (int i = 0; i < static_cast<int>(2*stepsH.size()); i++) {
-        if (i < static_cast<int>(stepsH.size())) {
+      // Add steps
+      for (int i = 0; i < static_cast<int>(stepsH.size()); i++) {
           neighbors.push_back(bestSolution + stepsH[i]);
-        } else {
+      }
+
+      // Subtract steps
+      for (int i = 0; i < static_cast<int>(stepsH.size()); i++) {
           neighbors.push_back(bestSolution - stepsH[i]);
-        }
       }
 
       for (int i = 0; i < static_cast<int>(neighbors.size()); i++) {
