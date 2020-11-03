@@ -23,7 +23,8 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample);
 	reg [4:0]cnt18;          // SCK to step through ADC control
 	reg [5:0]counter;
 	
-	// Scale the 50MHz FPGA clock to 1MHz
+	//----------------------------------------------------
+	// Create a counter to slow down processing
 	always @ (posedge clk or negedge rst) begin
 	
 		if(rst == 1'b0) counter <= 6'b0;
@@ -38,6 +39,8 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample);
 		
 	end
 	
+	//----------------------------------------------------
+	// Scale the 50MHz FPGA clock to 1MHz
 	always @ (posedge clk or negedge rst) begin
 	
 		if (rst == 1'b0) SCK <= 1'b0;
@@ -52,7 +55,7 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample);
    end
 	
 	//----------------------------------------------------
-	// Count to 19 to step through ADC initialization and data transfer
+	// Count to 18 to step through ADC initialization and data transfer
 	always @ (posedge clk or negedge rst) begin
 	
 		if (rst == 1'b0) cnt18 <= 5'd0;
