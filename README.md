@@ -17,6 +17,9 @@
 ### Fast_ADC_Tester.v
 ### FitnessFunctionTest.m
 ### Slow_ADC_Read_12bit.v
+8/4/2020 - Lucy updated Slow_ADC_Read_12bit.v
+  - Collects a single 12-bit sample from the 100kHz ADC
+  - An optional child of Data_Collector.v
 ### Solution_Test.m
 ### TabuSearch.cpp
 ### TabuSearch.m
