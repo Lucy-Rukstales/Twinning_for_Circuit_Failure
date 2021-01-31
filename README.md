@@ -11,6 +11,7 @@
 01/31/2021 - Gillian added Commented_Tabu_Example_Problem.m
   -  MATLAB Solution to Tabu Search Problem from IJNME Paper from Semester 1 - includes Comments
 ### Data_Collector.v
+8/4/2020 - Lucy updated Data_Collector.v
   - A parent of Arduino_Write_12bit.v and Fast_ADC_Read_12bit.v
 ### Fast_ADC_Read_12bit.v
 ### Fast_ADC_Tester.v
