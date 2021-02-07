@@ -16,6 +16,9 @@
 ### Fast_ADC_Read_12bit.v
 ### Fast_ADC_Tester.v
 ### FitnessFunctionTest.m
+### FitnessFunctionTest_Sem2.m
+02/07/2021 - Gillian added FitnessFunctionTest_Sem2.m
+  - Working fitness function code for this semester
 ### Slow_ADC_Read_12bit.v
 8/4/2020 - Lucy updated Slow_ADC_Read_12bit.v
   - Collects a single 12-bit sample from the 100kHz ADC
