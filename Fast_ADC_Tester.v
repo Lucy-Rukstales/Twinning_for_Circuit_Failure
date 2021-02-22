@@ -132,7 +132,6 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,rstLED,collectLED);
 		
 	end
 	
-////////////////////////////////////////////////////////////////////////////////
 	/*
 	 * Always block that collects data from the ADC
 	 *
