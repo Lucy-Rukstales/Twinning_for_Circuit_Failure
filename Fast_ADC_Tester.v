@@ -4,8 +4,6 @@
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell, Gillian Holman
 //
-// Top Module:		Data_Collector.v
-//
 // Description: 	This file allows for 12 bits of data to be collected from the 
 //						high frequency analog to digital converter (ADC). This runs 
 //						the ADC using a 2.5 MHz clock.
