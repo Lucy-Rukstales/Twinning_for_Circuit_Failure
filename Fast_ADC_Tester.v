@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Date: 	3/5/2021
+// Date: 	3/14/2021
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell, Gillian Holman
 //
@@ -29,7 +29,7 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
-module ADC_Tester(clk,rst,CS,SDO,SCK,sample,rstLED,collectLED);
+module ADC_Tester(clk,rst,CS,SDO,SCK,sample,status);
 	
 	// Declare inputs
 	input SDO; // Data output stream from the ADC
@@ -42,11 +42,10 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,rstLED,collectLED);
 	output reg [11:0]sample; 	// 12-bit data sample, collected from the ADC
 	reg [4:0]cnt18;   			// Counter to step through ADC timing diagram
 	reg [5:0]counter;				// Counter to scale a clock from 50 MHz to 2.5 MHz
-	
-	output rstLED; //temp
-	assign rstLED = rst; // temp
-	output reg collectLED; //temp
 
+	output reg status;
+	reg [3:0]cycle;
+	
 	/*
 	 * Always block that creates a counter to divide the 50 MHz FPGA clock by 20
 	 *
@@ -121,13 +120,21 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,rstLED,collectLED);
 	always @ (posedge clk or negedge rst) begin
 	
 		// If reset is low, do not begin ADC data transfer
-		if (rst == 1'b0) cnt18 <= 5'd0; 
+		if (rst == 1'b0) begin
+			cnt18 <= 5'd0; 
+			cycle <= 4'd0;
+		end
 		
-		// If counter is 10 (falling edge of SCK), increment cnt18 [0 18] to 
+		// If counter is 10 (falling edge of SCK), increment cnt18 [0 19] to 
 		// step through ADC timing diagram
-		else if (counter == 6'd10 && cnt18 < 5'd18) cnt18 <= cnt18 + 5'd1;
+		else if (counter == 6'd10 && cnt18 < 5'd17) cnt18 <= cnt18 + 5'd1;
 		
-		// If counter isn't 10 or cnt18 is 18, hold the value
+		// If counter isn't 10 or cnt18 is 19, hold the value
+		else if (counter == 6'd10 && cnt18 > 5'd16 && cycle < 4'd3) begin
+			cnt18 <= 1'b0;
+			cycle <= cycle + 1'd1;
+	   end
+		
 		else cnt18 <= cnt18;
 		
 	end
@@ -156,13 +163,13 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,rstLED,collectLED);
 			
 			CS <= 1'b1; // CS MUST be pulled high before cnt18 increments from 0
 			sample[11:0] <= 12'd0;
-			collectLED <= 1'b0; // temp
+			status <= 1'b0;
 		
 		end
 		
 		// On the rising edge of SCK, begin stepping through the ADC serial
 		// timing diagram
-		else if (counter == 6'd0) begin
+		else if (counter == 6'd0 && cycle < 4'd3) begin
 			
 			// On the first rising edge of the ADC serial timing diagram, pull CS low
 			// to begin data transfer
@@ -174,13 +181,17 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,rstLED,collectLED);
 				
 				// Shift SDO into the 12-bit sample so that it is MSB first
 				sample[11:0] <= {sample[10:0],SDO};
-				collectLED <= 1'b1; // temp
 			
 			end
 			
 			// On the [14 inf) rising edges of the ADC timing diagram, pull CS high
 			// to signify the end of data transfer
-			else if (cnt18 > 5'd13) CS = 1'b1;
+			else if (cnt18 > 5'd13) begin
+			
+				CS = 1'b1;
+				status <= 1'b1;
+				
+			end
 			
 			// On any missed (should be never) rising edges of the ADC timing diagram, 
 			// do nothing but keep the 12-bit sample on the LEDs
