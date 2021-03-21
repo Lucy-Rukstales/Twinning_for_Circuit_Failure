@@ -1,6 +1,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 //
-// Date: 	3/14/2021
+// Date: 	3/22/2021
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell, Gillian Holman
 //
@@ -41,7 +41,7 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,status);
 	output reg CS;  				// Chip select line that turns the ADC on
 	output reg [11:0]sample; 	// 12-bit data sample, collected from the ADC
 	reg [4:0]cnt18;   			// Counter to step through ADC timing diagram
-	reg [5:0]counter;				// Counter to scale a clock from 50 MHz to 2.5 MHz
+	reg [4:0]counter;				// Counter to scale a clock from 50 MHz to 2.5 MHz
 
 	output reg status;
 	reg [3:0]cycle;
@@ -59,16 +59,16 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,status);
 	always @ (posedge clk or negedge rst) begin
 	
 		// If reset is low, set counter to 0
-		if (rst == 1'b0) counter <= 6'd0;
+		if (rst == 1'b0) counter <= 4'd0;
 		
 		// If the user pulls rst high, increment counter
 		else begin
 		
 			// Count from [0 19]
-			if (counter < 6'd19) counter <= counter + 6'd1;
+			if (counter < 4'd19) counter <= counter + 4'd1;
 		
 			// If counter is 19, set it back to 0
-			else counter <= 6'd0;
+			else counter <= 4'd0;
 			
 		end
 		
@@ -95,10 +95,10 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,status);
 		else begin
 		
 			// Time high [0 10)
-			if (counter == 6'd0) SCK <= 1'b1;
+			if (counter == 4'd0) SCK <= 1'b1;
 			
 			// Time low [10 20)
-			else if (counter == 6'd10) SCK <= 1'b0;
+			else if (counter == 4'd10) SCK <= 1'b0;
 		
 		end
    end
@@ -127,10 +127,10 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,status);
 		
 		// If counter is 10 (falling edge of SCK), increment cnt18 [0 19] to 
 		// step through ADC timing diagram
-		else if (counter == 6'd10 && cnt18 < 5'd17) cnt18 <= cnt18 + 5'd1;
+		else if (counter == 4'd10 && cnt18 < 5'd17) cnt18 <= cnt18 + 5'd1;
 		
 		// If counter isn't 10 or cnt18 is 19, hold the value
-		else if (counter == 6'd10 && cnt18 > 5'd16 && cycle < 4'd3) begin
+		else if (counter == 4'd10 && cnt18 > 5'd16 && cycle < 4'd3) begin
 			cnt18 <= 1'b0;
 			cycle <= cycle + 1'd1;
 	   end
@@ -169,7 +169,7 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,status);
 		
 		// On the rising edge of SCK, begin stepping through the ADC serial
 		// timing diagram
-		else if (counter == 6'd0 && cycle < 4'd3) begin
+		else if (counter == 4'd0 && cycle < 4'd3) begin
 			
 			// On the first rising edge of the ADC serial timing diagram, pull CS low
 			// to begin data transfer
@@ -181,15 +181,16 @@ module ADC_Tester(clk,rst,CS,SDO,SCK,sample,status);
 				
 				// Shift SDO into the 12-bit sample so that it is MSB first
 				sample[11:0] <= {sample[10:0],SDO};
+				status <= 1'b1;
 			
 			end
 			
-			// On the [14 inf) rising edges of the ADC timing diagram, pull CS high
-			// to signify the end of data transfer
-			else if (cnt18 > 5'd13) begin
+			// On the [15 inf) rising edges of the ADC timing diagram, pull CS high
+			// to signify the end of data transfer // was [14 inf] before 3/18/2021
+			else if (cnt18 > 5'd14) begin
 			
 				CS = 1'b1;
-				status <= 1'b1;
+				status <= 1'b0;
 				
 			end
 			
