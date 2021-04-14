@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////
 //
-// Date: 		7/29/2020
+// Date: 		4/14/2020
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
@@ -27,24 +27,25 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 	output SS; 	 // Arduino - Chip Select
 	output MOSI; 	 // Arduino - Parent out child in
 
-	reg collection_status;	   // ADC reset switch - turns on ADC module
-	reg transmission_status;   // Arduino reset switch - turns on Arduino module
+	reg adc_rst;	   // ADC reset switch - turns on ADC module
+	reg arduino_rst;   // Arduino reset switch - turns on Arduino module
+	reg wren;
 	
-	reg [1199:0]storage;	   // Data from the ADC
-	reg [11:0]Arduino_Sample;  // Current 12-bit sample for Arduino
-	reg [6:0]collected_amt;    // Counts samples from ADC
-	reg [6:0]transmitted_amt;  // Counts samples sent to Arduino
+	reg [5:0]address;
 	
 	wire [11:0]ADC_Sample;	   // Current 12-bit sample from ADC
-	wire [6:0]cnt20;	   // Signal from ADC module
+	wire [11:0]Arduino_Sample;  // Current 12-bit sample for Arduino
+	wire [6:0]cnt20;	         // Signal from ADC module
 	wire [5:0]SCLtracker;	   // Signal from Arduino module
-	wire [6:0]storage_limit;   // "User-defined" amount of data to collect from ADC
+	wire [5:0]storage_limit;   // "User-defined" amount of data to collect from ADC
 	
-	assign storage_limit = 7'd100;
+	assign storage_limit = 6'd34;
 	
-	ADC_Read_12bit my_ADC(clk,collection_status,CS,P3,P4,P5,ADC_Sample,cnt20);
+	Slow_ADC_Read_12bit my_ADC(clk,adc_rst,CS,P3,P4,P5,ADC_Sample,cnt20);
 	
-	Arduino_Write_12bit my_Arduino(clk,transmission_status,Arduino_Sample,SCL,SS,MOSI,SCLtracker);
+	Arduino_Write_12bit my_Arduino(clk,arduino_rst,Arduino_Sample,SCL,SS,MOSI,SCLtracker);
+	
+	data memory(address,clk,ADC_Sample,wren,Arduino_Sample);
 	
 	//----------------------------------------------------
 	// Collect data from the ADC 12-bits at a time
@@ -54,45 +55,48 @@ module Data_Collector(clk,rst,CS,P3,P4,P5,SCL,SS,MOSI);
 		// Clears everything
 		if (rst == 1'b0) begin 
 		
-			storage[1199:0] <= 1200'd0;
-			collected_amt <= 7'd0; transmitted_amt <= 7'd0;
-			collection_status <= 1'b0; transmission_status <= 1'b0;
-			Arduino_Sample <= 12'd0;
+			adc_rst <= 1'b0; 
+			arduino_rst <= 1'b0;
+			address <= 6'd0;
+			wren <= 1'b1;
 			
 		end
 		
 		// Collect data from ADC until storage is filled
-		else if (collected_amt < storage_limit) begin
+		else if (wren == 1'b1) begin
 			
-			if (cnt20 == 7'd0) collection_status <= 1'b1;
+			if (address < storage_limit) begin
 			
-			else if (cnt20 == 7'd21) begin
+				if (cnt20 < 7'd21) adc_rst <= 1'b1;
+				
+				else if (adc_rst == 1'b1) begin
+				
+					address <= address + 6'd1;
+					adc_rst <= 1'b0;
+					
+				end
 			
-				storage <= storage << 12'd12;
-				storage[11:0] <= ADC_Sample[11:0];
-				collected_amt <= collected_amt + 7'd1;
-				collection_status <= 1'b0;
+			end
+			
+			else begin
+				
+				address <= 6'd0;
+				wren <= 1'b0;
 				
 			end
 			
 		end
 		
 		// Send data to Arduino until storage is emptied
-		else if (transmitted_amt < storage_limit) begin
+		else if (address < storage_limit) begin
 			
-			if (SCLtracker < 6'd36) begin
-				
-				Arduino_Sample[11:0] <= storage[1199:1188];	
-				transmission_status <= 1'b1;
-				
-			end				
+			if (SCLtracker < 6'd36) arduino_rst <= 1'b1;
 			
-			else if (transmission_status == 1'b1) begin
+			else if (arduino_rst == 1'b1) begin
 			
-				transmission_status <= 1'b0;
-				transmitted_amt <= transmitted_amt + 7'd1;
-				storage <= storage << 12'd12;
-				
+				address <= address + 6'd1;
+				arduino_rst <= 1'b0;
+								
 			end
 			
 		end
