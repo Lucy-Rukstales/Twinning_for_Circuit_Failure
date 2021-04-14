@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////
 //
-// Date: 		7/30/2020
+// Date: 		4/14/2020
 //
 // Contributors: 	Lucy Rukstales, Michaela Mitchell
 //
@@ -11,14 +11,14 @@
 //
 //////////////////////////////////////////////////////
 
-module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
+module Slow_ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 	
 	input P4;  // MISO - Data from ADC
 	input clk; // FPGA - 50MHz clock
 	input rst; // Reset switch
 	
 	output reg CS; // Chip Select - Turns ADC on
-	output reg P3; // ADC - 2MkHz clock
+	output reg P3; // ADC - 2MHz clock
 	output reg P5; // MOSI - Control data for ADC
 	
 	output reg [11:0]sample; // 12-bit data sample
@@ -43,7 +43,7 @@ module ADC_Read_12bit(clk,rst,CS,P3,P4,P5,sample,cnt20);
 	end
 	
 	//----------------------------------------------------
-	// Scale clock from 50MHz to roughly 2MkHz
+	// Scale clock from 50MHz to roughly 2MHz
 	// P3 to be ADC clock
 	always @ (posedge clk or negedge rst) begin
 		
