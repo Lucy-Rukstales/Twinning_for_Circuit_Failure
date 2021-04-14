@@ -1,6 +1,6 @@
 //////////////////////////////////////////////////////
 //
-// Date:          7/29/2020
+// Date:          4/14/2020
 //
 // Contributors:  Lucy Rukstales, Michaela Mitchell
 //
@@ -14,7 +14,7 @@
 
 #include<SPI.h> //SPI library
 volatile int i = 0; //volatile types to be sent to ISR
-const int numberOfSamples = 100; //Change based on how much data user wishes to collect //2048
+const int numberOfSamples = 34; //Change based on how much data user wishes to collect //2048
 byte twelveBitArray[numberOfSamples * 2]; //temporary storage array from ISR (2 bytes for each 12 bit sample)// 4096
 int sampleNumber = 0; //Intialize counter
 int sample[numberOfSamples]; // Final storage array
@@ -38,8 +38,8 @@ void loop(void) { // variable "processupto"
         sample[j / 2] = x | y;
       }
     } for (int k = 0; k < numberOfSamples; k++) {
-      Serial.println(sample[k]);
-      //Serial.println(((double)sample[k] / 4096.0) * 5.0);
+      // Serial.println(sample[k],BIN);
+      Serial.println(((double)sample[k] / 4096.0) * 5);
       delay(5000);
     }
     interrupts();
